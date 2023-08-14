@@ -6,6 +6,7 @@
 #include <other/other.h>
 #include <classes/Box.h>
 #include <classes/TreeNode.h>
+#include <classes/Projection.h>
 
 #include <iostream>
 #include <tuple>
@@ -30,12 +31,13 @@ int main()
     vectorOfBoxes.push_back(b2);
     TreeNode* tn1 = new TreeNode(0, -1, 10, 20, 1);
     tn1->setBoxes(vectorOfBoxes);
-    std::cout << "Arary dim: " << tn1->nBoxes << std::endl;
-    for(int i = 0; i < tn1->nBoxes; i++)
-    {
-        Box* b = tn1->boxes[i];
-        std::cout << "Info regarding box: " << b->x0 << " " << b->y0 << " " << b->xlen << " " << b->ylen << " " << b->ID << std::endl; 
-    }
+
+    std::vector<Projection*> vectorOfProjs;
+    Projection* p1 = new Projection(10, 20, 30, 40);
+    vectorOfProjs.push_back(p1);
+    tn1->setProjections(vectorOfProjs);
+
+    delete tn1;
     
     
     
