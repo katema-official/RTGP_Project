@@ -3,7 +3,13 @@
 
 #include <shader_s.h>
 
+#include <other/other.h>
+#include <classes/Box.h>
+#include <classes/TreeNode.h>
+
 #include <iostream>
+#include <tuple>
+#include <vector>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -12,8 +18,27 @@ void processInput(GLFWwindow* window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+int CURRENT_VAO = 0;
+
 int main()
 {
+    MyFunc();
+    Box* b1 = new Box(0,0,10,20,0);
+    Box* b2 = new Box(10,0, 30, 40, 1);
+    std::vector<Box*> vectorOfBoxes;
+    vectorOfBoxes.push_back(b1);
+    vectorOfBoxes.push_back(b2);
+    TreeNode* tn1 = new TreeNode(0, -1, 10, 20, 1);
+    tn1->setBoxes(vectorOfBoxes);
+    std::cout << "Arary dim: " << tn1->nBoxes << std::endl;
+    for(int i = 0; i < tn1->nBoxes; i++)
+    {
+        Box* b = tn1->boxes[i];
+        std::cout << "Info regarding box: " << b->x0 << " " << b->y0 << " " << b->xlen << " " << b->ylen << " " << b->ID << std::endl; 
+    }
+    
+    
+    
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -49,7 +74,7 @@ int main()
     // ------------------------------------
     Shader ourShader("shader_standard.vs", "shader_standard.fs"); // you can name your shader files however you like
 
-    float vertices[] = {
+    /*float vertices[] = {
         // positions         // colors
         -0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  //bl
          0.0f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  //br
@@ -89,12 +114,15 @@ int main()
     glEnableVertexAttribArray(0);
     // color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(1);*/
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     // glBindVertexArray(0);
 
+    unsigned int* VAOs = getVAOs();
+
+    glBindVertexArray(0);
 
     // render loop
     // -----------
@@ -107,11 +135,12 @@ int main()
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // render the triangle
         ourShader.use();
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAOs[CURRENT_VAO]);
+        //std::cout << "Vao: " << VAOs[CURRENT_VAO] << std::endl;
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);   //12 is the total number of vertices used, basically 3 * the number of triangles used
 
@@ -123,8 +152,8 @@ int main()
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    //glDeleteVertexArrays(1, &VAO);
+    //glDeleteBuffers(1, &VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -138,6 +167,21 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        if(CURRENT_VAO == 0)
+        { 
+            CURRENT_VAO = 1;
+            std::cout << "Changed to 1" << std::endl;
+        }
+        else
+        { 
+            CURRENT_VAO = 0;
+            std::cout << "Changed to 0" << std::endl;
+        }
+    }
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
