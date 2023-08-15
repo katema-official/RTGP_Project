@@ -1,5 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 #include <shader_s.h>
 
@@ -12,6 +14,8 @@
 #include <iostream>
 #include <tuple>
 #include <vector>
+
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -55,6 +59,22 @@ int main()
         delete [] new_rgb;
     }
     delete [] my_rgb;
+
+
+
+    FT_Library ft;
+    if (FT_Init_FreeType(&ft))
+    {
+        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+        return -1;
+    }
+
+    FT_Face face;
+    if (FT_New_Face(ft, "../fonts/ARIAL.TTF", 0, &face))
+    {
+        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;  
+        return -1;
+    }
     
     
     

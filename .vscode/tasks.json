@@ -17,6 +17,7 @@
                 "${workspaceFolder}/src/classes/\\*.cpp",
                 "${workspaceFolder}/src/utils/\\*.cpp",
                 "-lglfw3dll",
+                "-lfreetype",
                 "-o",
                 "${workspaceFolder}/main.exe"
             ],
