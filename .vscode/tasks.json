@@ -15,6 +15,7 @@
                 "${workspaceFolder}/src/glad.c",
                 "${workspaceFolder}/src/other/\\*.cpp",
                 "${workspaceFolder}/src/classes/\\*.cpp",
+                "${workspaceFolder}/src/utils/\\*.cpp",
                 "-lglfw3dll",
                 "-o",
                 "${workspaceFolder}/main.exe"

@@ -7,6 +7,7 @@
 #include <classes/Box.h>
 #include <classes/TreeNode.h>
 #include <classes/Projection.h>
+#include <utils/utils.h>
 
 #include <iostream>
 #include <tuple>
@@ -38,6 +39,22 @@ int main()
     tn1->setProjections(vectorOfProjs);
 
     delete tn1;
+
+
+
+    float* my_rgb = HSVtoRGB(270.0f, 0.67f, 0.77f);
+    std::cout << "colors RGB: " << my_rgb[0] << " " << my_rgb[1] << " " << my_rgb[2] << std::endl;
+
+    for(int i = 0; i < 4; i++)
+    {
+        std::cout << "Hoi!!!" << std::endl;
+        float* new_rgb = getColorFromID(i);
+        std::cout << "colors new RGB: " << new_rgb[0] << " " 
+                                        << new_rgb[1] << " " 
+                                        << new_rgb[2] << std::endl;
+        delete [] new_rgb;
+    }
+    delete [] my_rgb;
     
     
     
@@ -76,27 +93,58 @@ int main()
     // ------------------------------------
     Shader ourShader("shader_standard.vs", "shader_standard.fs"); // you can name your shader files however you like
 
-    /*float vertices[] = {
-        // positions         // colors
-        -0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  //bl
-         0.0f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  //br
-         -0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  //tl
-         0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,    //tr
+    std::vector<float> vertices_vector;
+    vertices_vector.push_back(-1.0f);
+    vertices_vector.push_back(-1.0f);
+    vertices_vector.push_back(0.0f);
+    float* rgb = getColorFromID(0);
+    for(int i = 0; i < 3; i++)
+    {
+        vertices_vector.push_back(rgb[i]);
+    }
 
+    vertices_vector.push_back(0.6f);
+    vertices_vector.push_back(-1.0f);
+    vertices_vector.push_back(0.0f);
+    rgb = getColorFromID(0);
+    for(int i = 0; i < 3; i++)
+    {
+        vertices_vector.push_back(rgb[i]);
+    }
 
-         0.0f, -0.5f, 0.0f,  0.0f, 1.0f, 1.0f,  //bl
-         0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 1.0f,  //br
-         0.0f, 0.5f, 0.0f,  0.0f, 1.0f, 1.0f,   //tl
-         0.5f, 0.5f, 0.0f,  0.0f, 1.0f, 1.0f    //tr
-    };
+    vertices_vector.push_back(-1.0f);
+    vertices_vector.push_back(-0.6f);
+    vertices_vector.push_back(0.0f);
+    rgb = getColorFromID(0);
+    for(int i = 0; i < 3; i++)
+    {
+        vertices_vector.push_back(rgb[i]);
+    }
+
+    vertices_vector.push_back(0.6f);
+    vertices_vector.push_back(-0.6f);
+    vertices_vector.push_back(0.0f);
+    rgb = getColorFromID(0);
+    for(int i = 0; i < 3; i++)
+    {
+        vertices_vector.push_back(rgb[i]);
+    }
+
+    int nVertices = vertices_vector.size();
+    float* vertices = (float*) malloc(nVertices * sizeof(float));
+    copy(vertices_vector.begin(), vertices_vector.end(), vertices);
+
+    for(int i = 0; i < nVertices; i++)
+    {
+        std::cout << vertices[i] << " ";
+    }
+    std::cout << std::endl;
 
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 2,  
-        1, 2, 3,
-
-        4, 5, 6,
-        5, 6, 7
+        1, 2, 3
     };
+
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -106,7 +154,8 @@ int main()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    //sizeof(vertices)
+    glBufferData(GL_ARRAY_BUFFER, nVertices * sizeof(float), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -116,11 +165,13 @@ int main()
     glEnableVertexAttribArray(0);
     // color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);*/
+    glEnableVertexAttribArray(1);
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     // glBindVertexArray(0);
+
+
 
     unsigned int* VAOs = getVAOs();
 
@@ -142,9 +193,11 @@ int main()
         // render the triangle
         ourShader.use();
         glBindVertexArray(VAOs[CURRENT_VAO]);
-        //std::cout << "Vao: " << VAOs[CURRENT_VAO] << std::endl;
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);   //12 is the total number of vertices used, basically 3 * the number of triangles used
+
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
