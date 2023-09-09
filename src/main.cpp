@@ -1,7 +1,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <ft2build.h>
-#include FT_FREETYPE_H
+#include FT_FREETYPE_H      //bro non so che dirti, sembra che l'ordine di inclusione di queste
+                            //cose sia importante. se sposti "glm/..." più giù non va
 
 #include <shader_s.h>
 
@@ -16,10 +22,6 @@
 #include <vector>
 #include <map>
 #include <string>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 
 
