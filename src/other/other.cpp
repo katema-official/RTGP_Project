@@ -62,10 +62,9 @@ void drawStaticInformations(int wContainer, int hContainer,
 
     float remainingVerticalSpace = 1.0f - heightPortion;
     float verticalOffset = remainingVerticalSpace / 7;
-    RenderText(textShader, "Node ID: ", 0.05, 1.0f - verticalOffset*2, 0.5, containerColor);
-    RenderText(textShader, "Father ID: ", 0.05, 1.0f - verticalOffset*4, 0.5, containerColor);
-    RenderText(textShader, "Level in tree: ", 0.05, 1.0f - verticalOffset*6, 0.5, containerColor);
-    std::cout << "y = " << 1.0f - verticalOffset*6 << std::endl;
+    RenderText(textShader, "Node ID: ", 0.02, 1.0f - verticalOffset*2, 0.5, containerColor);
+    RenderText(textShader, "Father ID: ", 0.02, 1.0f - verticalOffset*4, 0.5, containerColor);
+    RenderText(textShader, "Level in tree: ", 0.02, 1.0f - verticalOffset*6, 0.5, containerColor);
 
 
 

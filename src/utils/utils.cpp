@@ -134,7 +134,6 @@ void RenderText(Shader& shader, std::string text, float x, float y, float scale,
     }
 	x = x * SCR_WIDTH;
 	y = y * SCR_HEIGHT;
-	std::cout << "SCR_W = " << SCR_WIDTH << ", SCR_H = " << SCR_HEIGHT << std::endl;
 
 	// OpenGL state (for rendering text)
 	// ------------

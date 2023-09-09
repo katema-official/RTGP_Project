@@ -113,7 +113,6 @@ int main()
 
         RenderText(textShader, "This is sample text", 0.01f, 0.01f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
         RenderText(textShader, "(C) LearnOpenGL.com", 0.5f, 0.5f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
-        std::cout << "x = " << 0.5f * SCR_WIDTH << ", y = " << 0.5f * SCR_HEIGHT << std::endl;
 
 
         
@@ -166,8 +165,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
-    SCR_WIDTH = width;
-    SCR_HEIGHT = height;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
