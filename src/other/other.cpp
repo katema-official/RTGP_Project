@@ -38,25 +38,34 @@ void drawStaticInformations(int wContainer, int hContainer,
     int winnerLength = wContainer > hContainer ? wContainer : hContainer;
     int loserLength =  wContainer > hContainer ? hContainer : wContainer;
 
+    float widthPortion;
+    float heightPortion;
+
     if(winnerLength == wContainer)
     {
-        drawBoxShape(boxShader, buffersForBox, 0, 0, 0 + maxPortionDedicatedToContainer, 0 + wThickness, containerColor);  //bottom
-        float heightPortion = (hContainer * maxPortionDedicatedToContainer) / wContainer;
+        widthPortion = maxPortionDedicatedToContainer;
+        drawBoxShape(boxShader, buffersForBox, 0, 0, 0 + widthPortion, 0 + wThickness, containerColor);  //bottom
+        heightPortion = (hContainer * widthPortion) / wContainer;
         drawBoxShape(boxShader, buffersForBox, 0, 0, 0 + hThickness, 0 + heightPortion, containerColor);   //left
-        drawBoxShape(boxShader, buffersForBox, 0, 0 + heightPortion, 0 + maxPortionDedicatedToContainer, 0 + heightPortion - wThickness, containerColor);  //top
-        drawBoxShape(boxShader, buffersForBox, 0 + maxPortionDedicatedToContainer, 0, 0 + maxPortionDedicatedToContainer - hThickness, 0 + heightPortion, containerColor); //right
+        drawBoxShape(boxShader, buffersForBox, 0, 0 + heightPortion, 0 + widthPortion, 0 + heightPortion - wThickness, containerColor);  //top
+        drawBoxShape(boxShader, buffersForBox, 0 + widthPortion, 0, 0 + widthPortion - hThickness, 0 + heightPortion, containerColor); //right
     }
     else
     {
-        drawBoxShape(boxShader, buffersForBox, 0, 0, 0 + hThickness, 0 + maxPortionDedicatedToContainer, containerColor);  //left
-        float widthPortion = (wContainer * maxPortionDedicatedToContainer) / hContainer;
+        heightPortion = maxPortionDedicatedToContainer;
+        drawBoxShape(boxShader, buffersForBox, 0, 0, 0 + hThickness, 0 + heightPortion, containerColor);  //left
+        widthPortion = (wContainer * heightPortion) / hContainer;
         drawBoxShape(boxShader, buffersForBox, 0, 0, 0 + widthPortion, 0 + wThickness, containerColor);    //bottom
-        drawBoxShape(boxShader, buffersForBox, 0 + widthPortion, 0, 0 + widthPortion - hThickness, 0 + maxPortionDedicatedToContainer, containerColor);    //right
-        drawBoxShape(boxShader, buffersForBox, 0, 0 + maxPortionDedicatedToContainer, 0 + widthPortion, 0 + maxPortionDedicatedToContainer - wThickness, containerColor);    //top
+        drawBoxShape(boxShader, buffersForBox, 0 + widthPortion, 0, 0 + widthPortion - hThickness, 0 + heightPortion, containerColor);    //right
+        drawBoxShape(boxShader, buffersForBox, 0, 0 + heightPortion, 0 + widthPortion, 0 + heightPortion - wThickness, containerColor);    //top
     }
 
-    
-
+    float remainingVerticalSpace = 1.0f - heightPortion;
+    float verticalOffset = remainingVerticalSpace / 7;
+    RenderText(textShader, "Node ID: ", 0.05, 1.0f - verticalOffset*2, 0.5, containerColor);
+    RenderText(textShader, "Father ID: ", 0.05, 1.0f - verticalOffset*4, 0.5, containerColor);
+    RenderText(textShader, "Level in tree: ", 0.05, 1.0f - verticalOffset*6, 0.5, containerColor);
+    std::cout << "y = " << 1.0f - verticalOffset*6 << std::endl;
 
 
 

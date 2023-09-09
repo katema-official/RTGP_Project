@@ -11,7 +11,8 @@
 
 #include <shader_s.h>
 
-
+extern unsigned int SCR_WIDTH;
+extern unsigned int SCR_HEIGHT;
 
 
 //*********************************************************************************
@@ -125,6 +126,16 @@ Shader initTextRendering(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)
 // -------------------
 void RenderText(Shader& shader, std::string text, float x, float y, float scale, glm::vec3 color)
 {
+	if(x < 0 || x > 1 ||
+		y < 0 || y > 1)
+	{
+        std::cout << "ERROR::RenderText: data not between 0 and 1" << std::endl;
+        exit;
+    }
+	x = x * SCR_WIDTH;
+	y = y * SCR_HEIGHT;
+	std::cout << "SCR_W = " << SCR_WIDTH << ", SCR_H = " << SCR_HEIGHT << std::endl;
+
 	// OpenGL state (for rendering text)
 	// ------------
 	glEnable(GL_CULL_FACE);
