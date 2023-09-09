@@ -9,7 +9,12 @@
 
 //to draw informations regarding the instance considered that basically never change, such as
 //the container walls and some text
-void drawStaticInformations();
+void drawStaticInformations(int wContainer, int hContainer, 
+                            float wThickness, float hThickness,
+                            float maxPortionDedicatedToContainer,
+                            Shader boxShader, unsigned int* buffersForBox,
+                            Shader textShader
+                            );
 
 //to get the VAO, VBO and EBO to draw a single box
 unsigned int* getBuffersToDrawBoxShape();

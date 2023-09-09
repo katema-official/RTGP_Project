@@ -30,8 +30,8 @@ void processInput(GLFWwindow* window);
 
 
 // settings
-const unsigned int SCR_WIDTH = 1280;//800;
-const unsigned int SCR_HEIGHT = 720;//600;
+unsigned int SCR_WIDTH = 1280;//800;
+unsigned int SCR_HEIGHT = 720;//600;
 
 int CURRENT_VAO = 0;
 
@@ -73,8 +73,6 @@ int main()
         return -1;
     }
 
-    
-
 
     Shader textShader = initTextRendering(SCR_WIDTH, SCR_HEIGHT);
 
@@ -109,8 +107,7 @@ int main()
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);   //12 is the total number of vertices used, basically 3 * the number of triangles used
 
-        glm::vec3 color = glm::vec3(0.1, 0.1, 0.1);
-        drawBoxShape(ourShader, buffersForBox, 0, 0, 0.5, 0.1, color);
+        drawStaticInformations(125, 250, 0.02, 0.012, 0.8, ourShader, buffersForBox, textShader);
 
         
 
@@ -167,6 +164,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+    SCR_WIDTH = width;
+    SCR_HEIGHT = height;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)

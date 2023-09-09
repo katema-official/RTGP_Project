@@ -13,21 +13,49 @@
 
 //-wContainer: the width of the container
 //-hContainer: the height of the container
-//-wThickness: to express how thick the horizontal walls of the container should be wrt the width of the application
-//-hThickness: to express how thick the vertical walls of the container should be wrt the width of the application
+//-thickness: to express how thick the walls of the container should be wrt to SCR_WIDTH and SCR_HEIGHT respectively
 //-maxPortionDedicatedToContainer: to express the maximum percentage of the window that should be dedicated to the container
+//the remaining are data used to draw boxes or text
 void drawStaticInformations(int wContainer, int hContainer, 
                             float wThickness, float hThickness,
-                            float maxPortionDedicatedToContainer
+                            float maxPortionDedicatedToContainer,
+                            Shader boxShader, unsigned int* buffersForBox,
+                            Shader textShader
                             )
 {
     if(wThickness > 1 || wThickness <= 0 || 
-        hThickness > 1 || hThickness <= 0 ||
+        hThickness > 1 || hThickness <= 0 || 
         maxPortionDedicatedToContainer > 1 || maxPortionDedicatedToContainer <= 0)
     {
         std::cout << "ERROR::drawStaticInformations: data not between 0 and 1" << std::endl;
         exit;
     }
+
+    glm::vec3 containerColor = glm::vec3(0.0, 0.0, 0.0);
+    
+
+
+    int winnerLength = wContainer > hContainer ? wContainer : hContainer;
+    int loserLength =  wContainer > hContainer ? hContainer : wContainer;
+
+    if(winnerLength == wContainer)
+    {
+        drawBoxShape(boxShader, buffersForBox, 0, 0, 0 + maxPortionDedicatedToContainer, 0 + wThickness, containerColor);  //bottom
+        float heightPortion = (hContainer * maxPortionDedicatedToContainer) / wContainer;
+        drawBoxShape(boxShader, buffersForBox, 0, 0, 0 + hThickness, 0 + heightPortion, containerColor);   //left
+        drawBoxShape(boxShader, buffersForBox, 0, 0 + heightPortion, 0 + maxPortionDedicatedToContainer, 0 + heightPortion - wThickness, containerColor);  //top
+        drawBoxShape(boxShader, buffersForBox, 0 + maxPortionDedicatedToContainer, 0, 0 + maxPortionDedicatedToContainer - hThickness, 0 + heightPortion, containerColor); //right
+    }
+    else
+    {
+        drawBoxShape(boxShader, buffersForBox, 0, 0, 0 + hThickness, 0 + maxPortionDedicatedToContainer, containerColor);  //left
+        float widthPortion = (wContainer * maxPortionDedicatedToContainer) / hContainer;
+        drawBoxShape(boxShader, buffersForBox, 0, 0, 0 + widthPortion, 0 + wThickness, containerColor);    //bottom
+        drawBoxShape(boxShader, buffersForBox, 0 + widthPortion, 0, 0 + widthPortion - hThickness, 0 + maxPortionDedicatedToContainer, containerColor);    //right
+        drawBoxShape(boxShader, buffersForBox, 0, 0 + maxPortionDedicatedToContainer, 0 + widthPortion, 0 + maxPortionDedicatedToContainer - wThickness, containerColor);    //top
+    }
+
+    
 
 
 
