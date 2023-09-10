@@ -11,7 +11,9 @@ TreeNode::TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int _level)
     DB = _DB;
     level = _level;
     boxes = nullptr;        //the nullptr initialization is necessary in order to correctly free memory later on
+    nBoxes = 0;
     projections = nullptr;
+    nProjections = 0;
 }
 
 TreeNode::~TreeNode()
@@ -47,4 +49,17 @@ void TreeNode::setProjections(std::vector<Projection*> _projectionsVector)
     copy(_projectionsVector.begin(), _projectionsVector.end(), projections);
 }
 
+void TreeNode::printTreeNode()
+{
+    std::cout << "Boxes: " << std::endl;
+    for(int i = 0; i < nBoxes; i++)
+    {
+        boxes[i]->printBoxInfo();
+    }
+    std::cout << "Projections: " << std::endl;
+    for(int i = 0; i < nProjections; i++)
+    {
+        projections[i]->printProjectionInfo();
+    }
+}
 

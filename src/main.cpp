@@ -14,6 +14,7 @@
 #include <classes/TreeNode.h>
 #include <classes/Projection.h>
 #include <utils/utils.h>
+#include <InputReading/InputReading.h>
 
 #include <iostream>
 #include <tuple>
@@ -79,6 +80,35 @@ int main()
     // build and compile our shader program
     // ------------------------------------
     Shader ourShader("shader_standard.vs", "shader_standard.fs"); // you can name your shader files however you like
+
+
+
+
+
+    int nOfNodes = readNodesNumber();
+    std::cout << "nOfNodes = " << nOfNodes << std::endl;
+
+    int wContainer = 0;
+    int hContainer = 0;
+    std::vector<Box*> obstaclesVector;
+    std::vector<TreeNode*> treeNodesVector;
+
+    readNodesInformations(wContainer, hContainer, obstaclesVector, treeNodesVector);
+    std::cout << "w = " << wContainer << " h = " << hContainer << std::endl;
+    std::cout << "Obstacles: " << std::endl;
+    for(Box* i : obstaclesVector) i->printBoxInfo();
+    std::cout << "Tree nodes informations: " << std::endl;
+    for(TreeNode* t : treeNodesVector) t->printTreeNode();
+
+
+
+    Box* newBox = new Box(0, 0, 10, 10, 0);
+    obstaclesVector.push_back(newBox);
+    TreeNode* tn = new TreeNode(0, -1, 10, 20, 0);
+    tn->setBoxes(obstaclesVector);
+    delete tn;
+
+    
 
     
     unsigned int* buffersForBox = getBuffersToDrawBoxShape();

@@ -23,6 +23,8 @@ class TreeNode
         void setBoxes(std::vector<Box*> _boxesVector);
 
         void setProjections(std::vector<Projection*> _projectionsVector);
+
+        void printTreeNode();
 };
 
 

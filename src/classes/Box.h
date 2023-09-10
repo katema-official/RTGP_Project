@@ -11,4 +11,6 @@ class Box
 
         Box(int _x0, int _y0, int _xlen, int _ylen, int _ID);
 
+        void printBoxInfo();
+
 };
