@@ -3,6 +3,7 @@
 
 #include "other.h"
 #include "../utils/utils.h"
+#include "../MeaningfulCoordinates/MeaningfulCoordinates.h"
 
 #include <iostream>
 #include <tuple>
@@ -60,11 +61,37 @@ void drawStaticInformations(int wContainer, int hContainer,
         drawBoxShape(boxShader, buffersForBox, 0, 0 + heightPortion, 0 + widthPortion, 0 + heightPortion - wThickness, containerColor);    //top
     }
 
-    float remainingVerticalSpace = 1.0f - heightPortion;
-    float verticalOffset = remainingVerticalSpace / 7;
-    RenderText(textShader, "Node ID: ", 0.02, 1.0f - verticalOffset*2, 0.5, containerColor);
-    RenderText(textShader, "Father ID: ", 0.02, 1.0f - verticalOffset*4, 0.5, containerColor);
-    RenderText(textShader, "Level in tree: ", 0.02, 1.0f - verticalOffset*6, 0.5, containerColor);
+    glm::vec2 nodeIdCoords = getNodeId_STATIC_Coordinates(maxPortionDedicatedToContainer);
+    glm::vec2 fatherIdCoords = getFatherId_STATIC_Coordinates(maxPortionDedicatedToContainer);
+    glm::vec2 levelInTreeCoords = getLevelInTree_STATIC_Coordinates(maxPortionDedicatedToContainer);
+    glm::vec2 PBCoords = getPB_STATIC_Coordinates(maxPortionDedicatedToContainer);
+    glm::vec2 DBCoords = getDB_STATIC_Coordinates(maxPortionDedicatedToContainer);
+    RenderText(textShader, "Node ID: ", nodeIdCoords.x, nodeIdCoords.y, 0.5, containerColor);
+    RenderText(textShader, "Father ID: ", fatherIdCoords.x, fatherIdCoords.y, 0.5, containerColor);
+    RenderText(textShader, "Level in tree: ", levelInTreeCoords.x, levelInTreeCoords.y, 0.5, containerColor);
+    RenderText(textShader, "PB: ", PBCoords.x, PBCoords.y, 0.5, containerColor);
+    RenderText(textShader, "DB: ", DBCoords.x, DBCoords.y, 0.5, containerColor);
+
+    glm::vec4 containerDimensionsCoords = getContainerDimensions_STATIC_Coordinates(maxPortionDedicatedToContainer);
+    RenderText(textShader, "Container", containerDimensionsCoords.x, containerDimensionsCoords.y, 0.5, containerColor);
+    RenderText(textShader, "dimensions: ", containerDimensionsCoords.z, containerDimensionsCoords.w, 0.5, containerColor);
+
+    glm::vec2 a = getContainerDimensions_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
+    std::string dims = std::to_string(wContainer) + " x " + std::to_string(hContainer);
+    RenderText(textShader, dims, a.x, a.y, 0.5, containerColor);
+
+
+
+    nodeIdCoords = getNodeId_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
+    RenderText(textShader, "1490 ", nodeIdCoords.x, nodeIdCoords.y, 0.5, containerColor);
+    fatherIdCoords = getFatherId_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
+    RenderText(textShader, "1489 ", fatherIdCoords.x, fatherIdCoords.y, 0.5, containerColor);
+    levelInTreeCoords = getLevelInTree_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
+    RenderText(textShader, "3", levelInTreeCoords.x, levelInTreeCoords.y, 0.5, containerColor);
+    PBCoords = getPB_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
+    RenderText(textShader, "10000", PBCoords.x, PBCoords.y, 0.5, containerColor);
+    DBCoords = getDB_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
+    RenderText(textShader, "62500", DBCoords.x, DBCoords.y, 0.5, containerColor);
 
 
 
@@ -148,12 +175,6 @@ void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, flo
 
     //to free the vector
     std::vector<float>().swap(vertices_vector);
-
-    /*for(int i = 0; i < nVertices; i++)
-    {
-        std::cout << vertices[i] << " ";
-    }
-    std::cout << std::endl;*/
 
     
 

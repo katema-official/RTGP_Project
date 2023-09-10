@@ -107,12 +107,13 @@ int main()
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);   //12 is the total number of vertices used, basically 3 * the number of triangles used
 
-        drawStaticInformations(125, 250, 0.02, 0.012, 0.8, ourShader, buffersForBox, textShader);
+        drawStaticInformations(250, 200, 0.02, 0.012, 0.8, ourShader, buffersForBox, textShader);
+
 
         
 
-        RenderText(textShader, "This is sample text", 0.01f, 0.01f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "(C) LearnOpenGL.com", 0.5f, 0.5f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+        //RenderText(textShader, "This is sample text", 0.01f, 0.01f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+        //RenderText(textShader, "(C) LearnOpenGL.com", 0.5f, 0.5f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
 
 
         
