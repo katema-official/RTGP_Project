@@ -14,13 +14,33 @@
 
 #include <glm/glm.hpp>
 
+extern unsigned int SCR_WIDTH;
+extern unsigned int SCR_HEIGHT;
+
+extern int fontSize;
+
+glm::vec2 getContainerEffectiveDimensions(int wContainer, int hContainer, float maxPortionDedicatedToContainer)
+{
+    float wContainerTrue = (float) wContainer;
+    float hContainerTrue = (float) hContainer;
+    
+    float pixelsHorizontal = ((float) SCR_WIDTH) * maxPortionDedicatedToContainer;
+    float pixelsVertical = ((float) SCR_HEIGHT) * maxPortionDedicatedToContainer;
+    float ratio = pixelsVertical / pixelsHorizontal;
+
+    wContainerTrue = ratio * wContainerTrue;
+
+    return glm::vec2(wContainerTrue, hContainerTrue);
+}
+
 
 //-wContainer: the width of the container
 //-hContainer: the height of the container
 //-thickness: to express how thick the walls of the container should be wrt to SCR_WIDTH and SCR_HEIGHT respectively
 //-maxPortionDedicatedToContainer: to express the maximum percentage of the window that should be dedicated to the container
 //the remaining are data used to draw boxes or text
-void drawStaticInformations(int wContainer, int hContainer, 
+void drawStaticInformations(int wC, int hC,
+                            float wContainer, float hContainer, 
                             float wThickness, float hThickness,
                             float maxPortionDedicatedToContainer,
                             Shader boxShader, unsigned int* buffersForBox,
@@ -35,12 +55,11 @@ void drawStaticInformations(int wContainer, int hContainer,
         exit;
     }
 
+
     glm::vec3 containerColor = glm::vec3(0.0, 0.0, 0.0);
-    
 
-
-    int winnerLength = wContainer > hContainer ? wContainer : hContainer;
-    int loserLength =  wContainer > hContainer ? hContainer : wContainer;
+    float winnerLength = wContainer > hContainer ? wContainer : hContainer;
+    float loserLength =  wContainer > hContainer ? hContainer : wContainer;
 
     float widthPortion;
     float heightPortion;
@@ -68,7 +87,7 @@ void drawStaticInformations(int wContainer, int hContainer,
     //draw the obstacles
     for(Box* obs: obstaclesVector)
     {
-        glm::vec4 coords = fromInputBoxToRelativeCoordinates(obs, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
+        glm::vec4 coords = fromInputBoxToRelativeCoordinates(obs, wC, hC, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
         drawBoxShape(boxShader, buffersForBox, coords.x, coords.y, coords.z, coords.w, containerColor);
     }
 
@@ -90,24 +109,8 @@ void drawStaticInformations(int wContainer, int hContainer,
     RenderText(textShader, "dimensions: ", containerDimensionsCoords.z, containerDimensionsCoords.w, rescaleTextFactor, containerColor);
 
     glm::vec2 a = getContainerDimensions_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
-    std::string dims = std::to_string(wContainer) + " x " + std::to_string(hContainer);
+    std::string dims = std::to_string(wC) + " x " + std::to_string(hC);
     RenderText(textShader, dims, a.x, a.y, rescaleTextFactor, containerColor);
-
-
-
-    /*nodeIdCoords = getNodeId_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
-    RenderText(textShader, "1490 ", nodeIdCoords.x, nodeIdCoords.y, 0.5, containerColor);
-    fatherIdCoords = getFatherId_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
-    RenderText(textShader, "1489 ", fatherIdCoords.x, fatherIdCoords.y, 0.5, containerColor);
-    levelInTreeCoords = getLevelInTree_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
-    RenderText(textShader, "3", levelInTreeCoords.x, levelInTreeCoords.y, 0.5, containerColor);
-    PBCoords = getPB_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
-    RenderText(textShader, "10000", PBCoords.x, PBCoords.y, 0.5, containerColor);
-    DBCoords = getDB_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
-    RenderText(textShader, "62500", DBCoords.x, DBCoords.y, 0.5, containerColor);*/
-
-
-
 }
 
 unsigned int* getBuffersToDrawBoxShape()
@@ -213,11 +216,16 @@ void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, flo
 
 
 void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
-                    int wContainer, int hContainer, 
+                    int wC, int hC,
+                    float wContainer, float hContainer, 
                     float wThickness, float hThickness, 
                     float maxPortionDedicatedToContainer,
                     Shader& boxShader, Shader& textShader)
 {
+    float maxDim = wC > hC ? wC : hC;
+    float lengthSingleDottedLine = (5 * maxDim) / 250;
+    float thicknessProjection = (1 * maxDim) / 250;
+
     glm::vec2 coordsNodeID = getNodeId_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
     glm::vec2 coordsFatherID = getFatherId_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
     glm::vec2 coordsLevelInTree = getLevelInTree_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
@@ -241,13 +249,32 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
     {
         Box* thisBox = treeNode->boxes[i];
 
-        glm::vec4 coords = fromInputBoxToRelativeCoordinates(thisBox, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
+        glm::vec4 coords = fromInputBoxToRelativeCoordinates(thisBox, wC, hC, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
         int ID = thisBox->ID;
         float* colorsArray = getColorFromID(ID);
         glm::vec3 color = glm::vec3(colorsArray[0], colorsArray[1], colorsArray[2]);
 
         drawBoxShape(boxShader, boxBuffers, coords.x, coords.y, coords.z, coords.w, color);
-        RenderText(textShader, std::to_string(ID), coords.x, coords.y, rescaleTextID, textColor);
+
+        float minDim = thisBox->xlen < thisBox->ylen ? thisBox->xlen : thisBox->ylen;
+        
+        float xDiff = coords.z - coords.x;
+        float yDiff = coords.w - coords.y;
+        float xText = coords.x + (xDiff / 3.0);
+        float yText = coords.y + (yDiff / 3.0);
+
+        RenderText(textShader, std::to_string(ID), xText, yText, rescaleTextID, textColor);
+    }
+
+    for(int i = 0; i < treeNode->nProjections; i++)
+    {
+        Projection* thisProjection = treeNode->projections[i];
+        std::vector<glm::vec4> linesOfThisProjection = getProjectionAsDottedLine(thisProjection, wC, hC, wContainer, hContainer,
+                                                wThickness, hThickness, maxPortionDedicatedToContainer, lengthSingleDottedLine, thicknessProjection);
+        for(glm::vec4 line : linesOfThisProjection)
+        {
+            drawBoxShape(boxShader, boxBuffers, line.x, line.y, line.z, line.w, textColor);
+        }
     }
 
 }
@@ -257,11 +284,6 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
 
 
 
-
-void MyFunc() 
-{
-    std::cout << "Ohai from another .cpp file!" << std::endl;
-}
 
 unsigned int* getVAOs()
 {

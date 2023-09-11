@@ -3,18 +3,33 @@
 #include <glm/glm.hpp>
 
 #include "../classes/Box.h"
+#include "../classes/Projection.h"
+
+#include <vector>
 
 //to get the x0, y0, x1, y1 coordinates that represent the lower left and upper right point
 //of the container of this instance. We will store these coordinates in a vec4
-glm::vec4 getLowerLeftAndUpperRightCoordinatesOfContainer(int wContainer, int hContainer, 
+glm::vec4 getLowerLeftAndUpperRightCoordinatesOfContainer(float wContainer, float hContainer, 
                                                         float wThickness, float hThickness,
                                                         float maxPortionDedicatedToContainer);
 
 //to get the bottomLeft and upperRight coordinates of a box expressed in a coordinate system relative to
 //the container built, given an "inputBox" with integer x0, y0, xlen, ylen
-glm::vec4 fromInputBoxToRelativeCoordinates(Box* inputBox, int wContainer, int hContainer, 
+glm::vec4 fromInputBoxToRelativeCoordinates(Box* inputBox, 
+                                                        int wC, int hC,
+                                                        float wContainer, float hContainer, 
                                                         float wThickness, float hThickness,
                                                         float maxPortionDedicatedToContainer);
+
+//from a projection, get a vector of int[4], where each of them represents the x0, y0, x1, y1 coordinates
+//of small rectangles that will be used to represent the projection
+std::vector<glm::vec4> getProjectionAsDottedLine(Projection* proj,
+                                            int wC, int hC,
+                                            float wContainer, float hContainer, 
+                                            float wThickness, float hThickness,
+                                            float maxPortionDedicatedToContainer,
+                                            int lengthSingleDottedLine,
+                                            float thicknessProjection);
 
 //functions to obtain the x, y coordinates of the static lines of text, like "Node ID", "Father ID"...
 //In this way, if one wants to modify them, it only has to touch these functions

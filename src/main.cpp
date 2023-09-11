@@ -117,6 +117,14 @@ int main()
 
     currentNodeIndex = 0;
 
+
+    glm::vec2 dimsTrue = getContainerEffectiveDimensions(wContainer, hContainer, maxPortionDedicatedToContainer);
+    float wContainerTrue;
+    float hContainerTrue;
+    wContainerTrue = dimsTrue.x;
+    hContainerTrue = dimsTrue.y;
+
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -137,9 +145,9 @@ int main()
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);   //12 is the total number of vertices used, basically 3 * the number of triangles used
         */
 
-        drawStaticInformations(wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
+        drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
 
-        drawTreeNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
+        drawTreeNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
         
 
         //RenderText(textShader, "This is sample text", 0.01f, 0.01f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));

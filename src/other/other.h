@@ -6,11 +6,13 @@
 
 #include <glm/glm.hpp>
 
-
+//to get the dimension of the container such that it will respect the aspect ratio of the application
+glm::vec2 getContainerEffectiveDimensions(int wContainer, int hContainer, float maxPortionDedicatedToContainer);
 
 //to draw informations regarding the instance considered that basically never change, such as
 //the container walls and some text
-void drawStaticInformations(int wContainer, int hContainer, 
+void drawStaticInformations(int wC, int hC,
+                            float wContainer, float hContainer, 
                             float wThickness, float hThickness,
                             float maxPortionDedicatedToContainer,
                             Shader boxShader, unsigned int* buffersForBox,
@@ -26,7 +28,8 @@ void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, flo
 
 //to draw a node of the tree
 void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
-                    int wContainer, int hContainer, 
+                    int wC, int hC,
+                    float wContainer, float hContainer, 
                     float wThickness, float hThickness, 
                     float maxPortionDedicatedToContainer,
                     Shader& boxShader, Shader& textShader);
@@ -36,7 +39,6 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
 
 
 
-void MyFunc();
 
 unsigned int* getVAOs();
 

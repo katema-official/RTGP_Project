@@ -1,6 +1,8 @@
 #include "MeaningfulCoordinates.h"
 
 #include "../classes/Box.h"
+#include "../classes/Projection.h"
+#include "../other/other.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -8,9 +10,13 @@
 #include <glm/glm.hpp>
 
 #include <iostream>
+#include <vector>
+
+extern unsigned int SCR_WIDTH;
+extern unsigned int SCR_HEIGHT;
 
 
-glm::vec4 getLowerLeftAndUpperRightCoordinatesOfContainer(int wContainer, int hContainer, 
+glm::vec4 getLowerLeftAndUpperRightCoordinatesOfContainer(float wContainer, float hContainer, 
                                                         float wThickness, float hThickness,
                                                         float maxPortionDedicatedToContainer)
 {
@@ -22,8 +28,8 @@ glm::vec4 getLowerLeftAndUpperRightCoordinatesOfContainer(int wContainer, int hC
         exit;
     }
 
-    int winnerLength = wContainer > hContainer ? wContainer : hContainer;
-    int loserLength =  wContainer > hContainer ? hContainer : wContainer;
+    float winnerLength = wContainer > hContainer ? wContainer : hContainer;
+    float loserLength =  wContainer > hContainer ? hContainer : wContainer;
 
     glm::vec4 ret;
     ret.x = 0 + hThickness;
@@ -46,19 +52,21 @@ glm::vec4 getLowerLeftAndUpperRightCoordinatesOfContainer(int wContainer, int hC
     return ret;
 }
 
-glm::vec4 fromInputBoxToRelativeCoordinates(Box* inputBox, int wContainer, int hContainer, 
+glm::vec4 fromInputBoxToRelativeCoordinates(Box* inputBox, 
+                                            int wC, int hC,
+                                            float wContainer, float hContainer, 
                                             float wThickness, float hThickness,
                                             float maxPortionDedicatedToContainer)
 {
     glm::vec4 coordsContainer = getLowerLeftAndUpperRightCoordinatesOfContainer(wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
-    float x0Box = inputBox->x0;
-    float y0Box = inputBox->y0;
-    float x1Box = x0Box + inputBox->xlen;
-    float y1Box = y0Box + inputBox->ylen;
-    float x0 = (x0Box * 1.0) / wContainer;
-    float y0 = (y0Box * 1.0) / hContainer;
-    float x1 = (x1Box * 1.0) / wContainer;
-    float y1 = (y1Box * 1.0) / hContainer;
+    float x0Box = (float) inputBox->x0;
+    float y0Box = (float) inputBox->y0;
+    float x1Box = x0Box + (float) inputBox->xlen;
+    float y1Box = y0Box + (float) inputBox->ylen;
+    float x0 = (x0Box * 1.0) / (float) wC;
+    float y0 = (y0Box * 1.0) / (float) hC;
+    float x1 = (x1Box * 1.0) / (float) wC;
+    float y1 = (y1Box * 1.0) / (float) hC;
     float wDiff = coordsContainer.z - coordsContainer.x;
     float hDiff = coordsContainer.w - coordsContainer.y;
     x0 = (x0 * wDiff) / 1.0;
@@ -70,8 +78,117 @@ glm::vec4 fromInputBoxToRelativeCoordinates(Box* inputBox, int wContainer, int h
     x1 += coordsContainer.x;
     y1 += coordsContainer.y;
     return glm::vec4(x0, y0, x1, y1);
+}
+
+std::vector<glm::vec4> getProjectionAsDottedLine(Projection* proj,
+                                            int wC, int hC,
+                                            float wContainer, float hContainer, 
+                                            float wThickness, float hThickness,
+                                            float maxPortionDedicatedToContainer,
+                                            int lengthSingleDottedLine,
+                                            float thicknessProjection)
+{
+
+
+    glm::vec4 coordsContainer = getLowerLeftAndUpperRightCoordinatesOfContainer(wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
+    float ratio = ((float) SCR_HEIGHT) / ((float) SCR_WIDTH);
+
+    float verticalProjectionThickness = thicknessProjection;
+    float horizontalProjectionThickness = thicknessProjection;// * ratio;
+
+    bool verticalProjection;
+    if(proj->x1 == proj->x2)
+    {
+        //it's a vertical projection
+        verticalProjection = true;
+    }
+    else
+    {
+        //it's a horizontal projection
+        verticalProjection = false;
+    }
+
+    float x0;
+    float y0;
+    float xlen;
+    float ylen;
+
+    std::vector<glm::vec4> vectorOfProjectionLinesCoordinates;
+
+    if(verticalProjection)
+    {
+        int remainingSpaceToCover = abs(proj->y1 - proj->y2);
+        int yInitial = proj->y1 < proj->y2 ? proj->y1 : proj->y2;
+        x0 = (float) proj->x1 - verticalProjectionThickness / 2.0;
+        y0 = (float) yInitial;
+        xlen = verticalProjectionThickness;
+        ylen = lengthSingleDottedLine;
+
+        while(remainingSpaceToCover >= lengthSingleDottedLine)
+        {
+            glm::vec4 coordsThisLine = glm::vec4(x0, y0, xlen, ylen);
+            Box* p = new Box(x0, y0, xlen, ylen, -1);
+            glm::vec4 coords = fromInputBoxToRelativeCoordinates(p, wC, hC, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
+            delete p;
+
+            vectorOfProjectionLinesCoordinates.push_back(coords);
+            y0 += (float) lengthSingleDottedLine * 2;
+            remainingSpaceToCover -= lengthSingleDottedLine * 2;
+        }
+
+        if(remainingSpaceToCover > 0)
+        {
+            ylen = remainingSpaceToCover;
+            glm::vec4 coordsThisLine = glm::vec4(x0, y0, xlen, ylen);
+            Box* p = new Box(x0, y0, xlen, ylen, -1);
+            glm::vec4 coords = fromInputBoxToRelativeCoordinates(p, wC, hC, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
+            delete p;
+
+            vectorOfProjectionLinesCoordinates.push_back(coords);
+        }
+        
+    }
+    else
+    {
+        int remainingSpaceToCover = abs(proj->x1 - proj->x2);
+        int xInitial = proj->x1 < proj->x2 ? proj->x1 : proj->x2;
+        x0 = (float) xInitial;
+        y0 = (float) proj->y1 - horizontalProjectionThickness / 2.0;
+        xlen = lengthSingleDottedLine;
+        ylen = horizontalProjectionThickness;
+
+        while(remainingSpaceToCover >= lengthSingleDottedLine)
+        {
+            glm::vec4 coordsThisLine = glm::vec4(x0, y0, xlen, ylen);
+            Box* p = new Box(x0, y0, xlen, ylen, -1);
+            glm::vec4 coords = fromInputBoxToRelativeCoordinates(p, wC, hC, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
+            delete p;
+
+            vectorOfProjectionLinesCoordinates.push_back(coords);
+            x0 += (float) lengthSingleDottedLine * 2;
+            remainingSpaceToCover -= lengthSingleDottedLine * 2;
+        }
+
+        if(remainingSpaceToCover > 0)
+        {
+            xlen = remainingSpaceToCover;
+            glm::vec4 coordsThisLine = glm::vec4(x0, y0, xlen, ylen);
+            Box* p = new Box(x0, y0, xlen, ylen, -1);
+            glm::vec4 coords = fromInputBoxToRelativeCoordinates(p, wC, hC, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
+            delete p;
+
+            vectorOfProjectionLinesCoordinates.push_back(coords);
+        }
+    }
+
+
+    
+
+    return vectorOfProjectionLinesCoordinates;
 
 }
+
+
 
 glm::vec2 getNodeId_STATIC_Coordinates(float maxPortionDedicatedToContainer)
 {

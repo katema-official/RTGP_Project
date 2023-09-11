@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Box::Box(int _x0, int _y0, int _xlen, int _ylen, int _ID)
+Box::Box(float _x0, float _y0, float _xlen, float _ylen, int _ID)
 {
     x0 = _x0;
     y0 = _y0;
