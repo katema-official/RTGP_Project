@@ -10,13 +10,14 @@ class TreeNode
         int fatherID;
         int PB;
         int DB;
+        int bestPB;
         int level;
         Box** boxes;
         int nBoxes;
         Projection** projections;
         int nProjections;
 
-        TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int _level);
+        TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int bestPB, int _level);
 
         ~TreeNode();
 

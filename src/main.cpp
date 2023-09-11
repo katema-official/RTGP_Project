@@ -8,6 +8,7 @@
     
 
 #include <shader_s.h>
+#include <settings.h>
 
 #include <other/other.h>
 #include <classes/Box.h>
@@ -32,8 +33,8 @@ bool shiftPressed = false;
 
 
 // settings
-unsigned int SCR_WIDTH = 1280;//800;
-unsigned int SCR_HEIGHT = 720;//600;
+extern unsigned int SCR_WIDTH;
+extern unsigned int SCR_HEIGHT;
 
 int CURRENT_VAO = 0;
 

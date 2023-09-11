@@ -3,12 +3,13 @@
 #include <iostream>
 
 
-TreeNode::TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int _level)
+TreeNode::TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int _bestPB, int _level)
 {
     nodeID = _nodeID;
     fatherID = _fatherID;
     PB = _PB;
     DB = _DB;
+    bestPB = _bestPB;
     level = _level;
     boxes = nullptr;        //the nullptr initialization is necessary in order to correctly free memory later on
     nBoxes = 0;
@@ -62,7 +63,7 @@ void TreeNode::printTreeNode()
     {
         boxes[i]->printBoxInfo();
     }
-    
+
     std::cout << "Projections: " << std::endl;
     for(int i = 0; i < nProjections; i++)
     {

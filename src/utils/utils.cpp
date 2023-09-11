@@ -10,9 +10,12 @@
 #include <string>
 
 #include <shader_s.h>
+#include <settings.h>
 
 extern unsigned int SCR_WIDTH;
 extern unsigned int SCR_HEIGHT;
+extern int fontSize;
+extern unsigned int VAO_Text, VBO_Text;
 
 
 //*********************************************************************************
@@ -27,9 +30,8 @@ struct Character {
     unsigned int Advance;   // Horizontal offset to advance to next glyph
 };
 std::map<GLchar, Character> Characters;
-unsigned int VAO_Text, VBO_Text;
 
-int fontSize = 192;
+
 
 //to initialize all the things that allow to perform text rendering
 Shader initTextRendering(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)

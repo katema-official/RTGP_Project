@@ -12,6 +12,8 @@
 #include <iostream>
 #include <vector>
 
+#include <settings.h>
+
 extern unsigned int SCR_WIDTH;
 extern unsigned int SCR_HEIGHT;
 
@@ -230,12 +232,20 @@ glm::vec2 getDB_STATIC_Coordinates(float maxPortionDedicatedToContainer)
     return glm::vec2(xOffset_2, 1.0f - yOffset_1*4);
 }
 
+glm::vec2 getBestPB_STATIC_Coordinates(float maxPortionDedicatedToContainer)
+{
+    float remainingVerticalSpace = 1.0f - maxPortionDedicatedToContainer;
+    float yOffset_1 = remainingVerticalSpace / 7;
+    float xOffset_2 = 0.3;
+    return glm::vec2(xOffset_2, 1.0f - yOffset_1*6);
+}
+
 glm::vec4 getContainerDimensions_STATIC_Coordinates(float maxPortionDedicatedToContainer)
 {
-    float verticalSpaceOnTheRight = 0.3;
+    float verticalSpaceOnTheRight = 0.15;
     float yOffset_2 = verticalSpaceOnTheRight / 5;
     float xOffset_3 = maxPortionDedicatedToContainer + 0.01;
-    return glm::vec4(xOffset_3, 0 + yOffset_2 * 4, xOffset_3, 0 + 0 + yOffset_2 * 4 - 0.04);
+    return glm::vec4(xOffset_3, 0 + yOffset_2 * 4, xOffset_3, 0 + yOffset_2 * 4 - 0.04);
 }
 
 
@@ -275,10 +285,17 @@ glm::vec2 getDB_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer)
     return ret;
 }
 
+glm::vec2 getBestPB_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer)
+{
+    glm::vec2 ret = getBestPB_STATIC_Coordinates(maxPortionDedicatedToContainer);
+    ret.x += 0.08;
+    return ret;
+}
+
 glm::vec2 getContainerDimensions_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer)
 {
-    float verticalSpaceOnTheRight = 0.3;
+    float verticalSpaceOnTheRight = 0.15;
     float yOffset_2 = verticalSpaceOnTheRight / 5;
     float xOffset_3 = maxPortionDedicatedToContainer + 0.01;
-    return glm::vec2(xOffset_3, 0 + yOffset_2 * 2);
+    return glm::vec2(xOffset_3, 0 + yOffset_2 * 2 - 0.04);
 }
