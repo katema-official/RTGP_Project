@@ -2,9 +2,17 @@
 
 #include <glm/glm.hpp>
 
+#include "../classes/Box.h"
+
 //to get the x0, y0, x1, y1 coordinates that represent the lower left and upper right point
 //of the container of this instance. We will store these coordinates in a vec4
 glm::vec4 getLowerLeftAndUpperRightCoordinatesOfContainer(int wContainer, int hContainer, 
+                                                        float wThickness, float hThickness,
+                                                        float maxPortionDedicatedToContainer);
+
+//to get the bottomLeft and upperRight coordinates of a box expressed in a coordinate system relative to
+//the container built, given an "inputBox" with integer x0, y0, xlen, ylen
+glm::vec4 fromInputBoxToRelativeCoordinates(Box* inputBox, int wContainer, int hContainer, 
                                                         float wThickness, float hThickness,
                                                         float maxPortionDedicatedToContainer);
 

@@ -14,7 +14,7 @@ void drawStaticInformations(int wContainer, int hContainer,
                             float wThickness, float hThickness,
                             float maxPortionDedicatedToContainer,
                             Shader boxShader, unsigned int* buffersForBox,
-                            Shader textShader
+                            Shader textShader, std::vector<Box*> obstaclesVector
                             );
 
 //to get the VAO, VBO and EBO to draw a single box
@@ -25,7 +25,11 @@ unsigned int* getBuffersToDrawBoxShape();
 void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, float x1, float y1, glm::vec3 color);
 
 //to draw a node of the tree
-void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers);
+void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
+                    int wContainer, int hContainer, 
+                    float wThickness, float hThickness, 
+                    float maxPortionDedicatedToContainer,
+                    Shader& boxShader, Shader& textShader);
 
 
 

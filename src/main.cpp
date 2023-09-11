@@ -28,6 +28,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void processInput(GLFWwindow* window);
 
 
+bool shiftPressed = false;
 
 
 // settings
@@ -81,7 +82,7 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader ourShader("shader_standard.vs", "shader_standard.fs"); // you can name your shader files however you like
+    Shader boxShader("shader_standard.vs", "shader_standard.fs"); // you can name your shader files however you like
 
 
 
@@ -94,13 +95,16 @@ int main()
     int hContainer = 0;
     std::vector<Box*> obstaclesVector;
     std::vector<TreeNode*> treeNodesVector;
+    float wThickness = 0.02;
+    float hThickness = 0.012;
+    float maxPortionDedicatedToContainer = 0.8;
 
     readNodesInformations(wContainer, hContainer, obstaclesVector, treeNodesVector);
-    std::cout << "w = " << wContainer << " h = " << hContainer << std::endl;
+    /*std::cout << "w = " << wContainer << " h = " << hContainer << std::endl;
     std::cout << "Obstacles: " << std::endl;
     for(Box* i : obstaclesVector) i->printBoxInfo();
     std::cout << "Tree nodes informations: " << std::endl;
-    for(TreeNode* t : treeNodesVector) t->printTreeNode();
+    for(TreeNode* t : treeNodesVector) t->printTreeNode();*/
 
 
     
@@ -127,14 +131,15 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // render the triangle
-        ourShader.use();
+        /*boxShader.use();
         glBindVertexArray(VAOs[CURRENT_VAO]);
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);   //12 is the total number of vertices used, basically 3 * the number of triangles used
+        */
 
-        drawStaticInformations(250, 200, 0.02, 0.012, 0.8, ourShader, buffersForBox, textShader);
+        drawStaticInformations(wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
 
-        drawTreeNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox);
+        drawTreeNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
         
 
         //RenderText(textShader, "This is sample text", 0.01f, 0.01f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
@@ -182,6 +187,25 @@ void processInput(GLFWwindow* window)
         }
     }*/
 
+    if(shiftPressed)
+    {
+        if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        {
+            if(currentNodeIndex < numberOfNodes - 1)
+            {
+                currentNodeIndex += 1;
+            }
+        }
+
+        if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        {
+            if(currentNodeIndex > 0)
+            {
+                currentNodeIndex -= 1;
+            }
+        }
+    }
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -209,20 +233,35 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
     }
 
-    if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+
+
+    if(key == GLFW_KEY_LEFT_SHIFT && action == GLFW_PRESS)
     {
-        if(currentNodeIndex < numberOfNodes - 1)
-        {
-            currentNodeIndex += 1;
-        }
+        shiftPressed = true;
+    }
+    if(key == GLFW_KEY_LEFT_SHIFT && action == GLFW_RELEASE)
+    {
+        shiftPressed = false;
     }
 
-    if(key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+    if(!shiftPressed)
     {
-        if(currentNodeIndex > 0)
+        if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
         {
-            currentNodeIndex -= 1;
+            if(currentNodeIndex < numberOfNodes - 1)
+            {
+                currentNodeIndex += 1;
+            }
+        }
+
+        if(key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+        {
+            if(currentNodeIndex > 0)
+            {
+                currentNodeIndex -= 1;
+            }
         }
     }
+    
 }
 

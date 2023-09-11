@@ -29,6 +29,8 @@ struct Character {
 std::map<GLchar, Character> Characters;
 unsigned int VAO_Text, VBO_Text;
 
+int fontSize = 192;
+
 //to initialize all the things that allow to perform text rendering
 Shader initTextRendering(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)
 {
@@ -55,7 +57,7 @@ Shader initTextRendering(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)
     else
     {
         // set size to load glyphs as
-        FT_Set_Pixel_Sizes(face, 0, 48);
+        FT_Set_Pixel_Sizes(face, 0, fontSize);
 
         // disable byte-alignment restriction
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -249,7 +251,7 @@ float* getColorFromID(int ID)
 	int H = (49 * ID) % 360;
 	float offset = 1.0f / ((float) ID + 1);
 
-	std::cout << "offset = " << offset << std::endl;
+	//std::cout << "offset = " << offset << std::endl;
 
 	while(offset > 0.5f)
 	{

@@ -1,5 +1,7 @@
 #include "MeaningfulCoordinates.h"
 
+#include "../classes/Box.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -24,24 +26,51 @@ glm::vec4 getLowerLeftAndUpperRightCoordinatesOfContainer(int wContainer, int hC
     int loserLength =  wContainer > hContainer ? hContainer : wContainer;
 
     glm::vec4 ret;
-    ret.x = 0 + hContainer;
-    ret.y = 0 + wContainer;
+    ret.x = 0 + hThickness;
+    ret.y = 0 + wThickness;
 
     if(winnerLength == wContainer)
     {
         float heightPortion = (hContainer * maxPortionDedicatedToContainer) / wContainer;
 
-        ret.z = 0 + maxPortionDedicatedToContainer - hContainer;
-        ret.w = 0 + heightPortion - wContainer;
+        ret.z = 0 + maxPortionDedicatedToContainer - hThickness;
+        ret.w = 0 + heightPortion - wThickness;
     }
     else
     {
         float widthPortion = (wContainer * maxPortionDedicatedToContainer) / hContainer;
-        ret.z = 0 + widthPortion - hContainer;
-        ret.w = 0 + maxPortionDedicatedToContainer - wContainer;
+        ret.z = 0 + widthPortion - hThickness;
+        ret.w = 0 + maxPortionDedicatedToContainer - wThickness;
     }
 
     return ret;
+}
+
+glm::vec4 fromInputBoxToRelativeCoordinates(Box* inputBox, int wContainer, int hContainer, 
+                                            float wThickness, float hThickness,
+                                            float maxPortionDedicatedToContainer)
+{
+    glm::vec4 coordsContainer = getLowerLeftAndUpperRightCoordinatesOfContainer(wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
+    float x0Box = inputBox->x0;
+    float y0Box = inputBox->y0;
+    float x1Box = x0Box + inputBox->xlen;
+    float y1Box = y0Box + inputBox->ylen;
+    float x0 = (x0Box * 1.0) / wContainer;
+    float y0 = (y0Box * 1.0) / hContainer;
+    float x1 = (x1Box * 1.0) / wContainer;
+    float y1 = (y1Box * 1.0) / hContainer;
+    float wDiff = coordsContainer.z - coordsContainer.x;
+    float hDiff = coordsContainer.w - coordsContainer.y;
+    x0 = (x0 * wDiff) / 1.0;
+    y0 = (y0 * hDiff) / 1.0;
+    x1 = (x1 * wDiff) / 1.0;
+    y1 = (y1 * hDiff) / 1.0;
+    x0 += coordsContainer.x;
+    y0 += coordsContainer.y;
+    x1 += coordsContainer.x;
+    y1 += coordsContainer.y;
+    return glm::vec4(x0, y0, x1, y1);
+
 }
 
 glm::vec2 getNodeId_STATIC_Coordinates(float maxPortionDedicatedToContainer)
