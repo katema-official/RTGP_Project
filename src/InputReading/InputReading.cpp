@@ -73,11 +73,11 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
         getline(infoFile, line);
         int fatherID = stoi(line);
         getline(infoFile, line);
-        int levelInTree = stoi(line);
-        getline(infoFile, line);
         int PB = stoi(line);
         getline(infoFile, line);
         int DB = stoi(line);
+        getline(infoFile, line);
+        int levelInTree = stoi(line);
 
         bool finishedReadingBoxes = false;
         std::vector<Box*> boxesPlaced;

@@ -4,6 +4,9 @@
 #include "other.h"
 #include "../utils/utils.h"
 #include "../MeaningfulCoordinates/MeaningfulCoordinates.h"
+#include "../classes/TreeNode.h"
+#include "../classes/Box.h"
+#include "../classes/Projection.h"
 
 #include <iostream>
 #include <tuple>
@@ -195,6 +198,14 @@ void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, flo
     free(vertices);
 }
 
+
+
+
+
+void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers)
+{
+    
+}
 
 
 

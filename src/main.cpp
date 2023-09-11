@@ -36,6 +36,8 @@ unsigned int SCR_HEIGHT = 720;//600;
 
 int CURRENT_VAO = 0;
 
+int currentNodeIndex = 0;
+int numberOfNodes;
 
 
 int main()
@@ -85,8 +87,8 @@ int main()
 
 
 
-    int nOfNodes = readNodesNumber();
-    std::cout << "nOfNodes = " << nOfNodes << std::endl;
+    numberOfNodes = readNodesNumber();
+    std::cout << "numberOfNodes = " << numberOfNodes << std::endl;
 
     int wContainer = 0;
     int hContainer = 0;
@@ -101,15 +103,6 @@ int main()
     for(TreeNode* t : treeNodesVector) t->printTreeNode();
 
 
-
-    Box* newBox = new Box(0, 0, 10, 10, 0);
-    obstaclesVector.push_back(newBox);
-    TreeNode* tn = new TreeNode(0, -1, 10, 20, 0);
-    tn->setBoxes(obstaclesVector);
-    delete tn;
-
-    
-
     
     unsigned int* buffersForBox = getBuffersToDrawBoxShape();
 
@@ -117,6 +110,8 @@ int main()
     unsigned int* VAOs = getVAOs();
 
     glBindVertexArray(0);
+
+    currentNodeIndex = 0;
 
     // render loop
     // -----------
@@ -139,7 +134,7 @@ int main()
 
         drawStaticInformations(250, 200, 0.02, 0.012, 0.8, ourShader, buffersForBox, textShader);
 
-
+        drawTreeNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox);
         
 
         //RenderText(textShader, "This is sample text", 0.01f, 0.01f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
@@ -211,6 +206,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         { 
             CURRENT_VAO = 0;
             std::cout << "Changed to 0" << std::endl;
+        }
+    }
+
+    if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+    {
+        if(currentNodeIndex < numberOfNodes - 1)
+        {
+            currentNodeIndex += 1;
+        }
+    }
+
+    if(key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+    {
+        if(currentNodeIndex > 0)
+        {
+            currentNodeIndex -= 1;
         }
     }
 }

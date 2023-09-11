@@ -51,11 +51,18 @@ void TreeNode::setProjections(std::vector<Projection*> _projectionsVector)
 
 void TreeNode::printTreeNode()
 {
+    std::cout << "Node ID: " << nodeID << std::endl;
+    std::cout << "Father ID: " << fatherID << std::endl;
+    std::cout << "Level in tree: " << level << std::endl;
+    std::cout << "PB: " << PB << std::endl;
+    std::cout << "DB: " << DB << std::endl;
+
     std::cout << "Boxes: " << std::endl;
     for(int i = 0; i < nBoxes; i++)
     {
         boxes[i]->printBoxInfo();
     }
+    
     std::cout << "Projections: " << std::endl;
     for(int i = 0; i < nProjections; i++)
     {

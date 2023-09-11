@@ -2,6 +2,7 @@
 #include <tuple>
 
 #include <shader_s.h>
+#include "../classes/TreeNode.h"
 
 #include <glm/glm.hpp>
 
@@ -22,6 +23,12 @@ unsigned int* getBuffersToDrawBoxShape();
 //to draw a box given the bottom-left vertex and the upper-right one.
 //x0, y0, x1, y1 are always expressed between 0 and 1.
 void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, float x1, float y1, glm::vec3 color);
+
+//to draw a node of the tree
+void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers);
+
+
+
 
 
 
