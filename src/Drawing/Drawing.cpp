@@ -301,7 +301,10 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
     float y = quantitiesInitialCoords.y;
     int index = 0;
 
-    float wAdd = Characters[':'].Size.x * scalingQuantitiesText + 0.003;
+    float yMax = getContainerDimensions_STATIC_Coordinates(maxPortionDedicatedToContainer).y;   //the lowest y value we can reach in a column before covering other text ("Container dimensions: ")
+    float wAdd = Characters[':'].Size.x * scalingQuantitiesText + 0.003;                        //an offset to add to the width of the character so that the colored box behind it covers the ID completely
+    float xOffset = Characters['0'].Size.x * 2 * scalingQuantitiesText;                         //when the current column is about to go past yMax, we have to create a new column on the right. This parameter gives a small horizontal offset to avoid overlapping of text
+    
     for(int i : treeNode->remainingQuantities)
     {
         int q = i;
@@ -311,6 +314,14 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
         RenderText(textShader, actualText, x, y, scalingQuantitiesText, textColor);
         index++;
         y -= (h / SCR_HEIGHT) * 1.3;
+
+        //shall we go to the right?
+        if(y - (h / SCR_HEIGHT) * 1.3 <= yMax)
+        {
+
+            y = quantitiesInitialCoords.y;
+            x = quantitiesInitialCoords.x + (((w + wAdd + xOffset) * ID_len) / SCR_WIDTH);
+        }
     }
 
     /*

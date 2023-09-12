@@ -303,7 +303,7 @@ glm::vec2 getContainerDimensions_DYNAMIC_Coordinates(float maxPortionDedicatedTo
 
 glm::vec2 getRemainingQuantities_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer)
 {
-    float firstHeight = 1.0 - 0.1;
+    float firstHeight = 1.0 - 0.06;
     float xOffset = maxPortionDedicatedToContainer + 0.01;
     return glm::vec2(xOffset, firstHeight);
 }

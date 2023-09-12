@@ -8,7 +8,7 @@ inline unsigned int VBO_Text;
 inline unsigned int SCR_WIDTH = 1280;
 inline unsigned int SCR_HEIGHT = 720;
 
-inline float scalingQuantitiesText = 0.10;
+inline float scalingQuantitiesText = 0.15;
 
 /// Holds all state information relevant to a character as loaded using FreeType
 struct Character {
