@@ -117,6 +117,31 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
             }  
         }
 
+        finishedReadingBoxes = false;
+        std::vector<Box*> falseBoxesPlaced;
+        while(!finishedReadingBoxes)
+        {
+            getline(infoFile, line);
+            if(line == "-----")
+            {
+                finishedReadingBoxes = true;
+            }
+            else
+            {
+                std::string arrOfBoxData[4];
+                int i = 0;
+                std::stringstream ssin(line);
+                while (ssin.good() && i < 4)
+                {
+                    ssin >> arrOfBoxData[i];
+                    i++;
+                }
+                Box* newBox = new Box(stoi(arrOfBoxData[0]), stoi(arrOfBoxData[1]),
+                                            stoi(arrOfBoxData[2]), stoi(arrOfBoxData[3]), -1);
+                falseBoxesPlaced.push_back(newBox);
+            }  
+        }
+
         bool finishedReadingProjections = false;
         std::vector<Projection*> projections;
         while(!finishedReadingProjections)
@@ -146,6 +171,7 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
         TreeNode* newTreeNode = new TreeNode(nodeID, fatherID, PB, DB, bestPB, levelInTree, remainingQuantities);
         newTreeNode->setBoxes(boxesPlaced);
         newTreeNode->setProjections(projections);
+        newTreeNode->setFalseBoxes(falseBoxesPlaced);
         treeNodesVector.push_back(newTreeNode);
 
 

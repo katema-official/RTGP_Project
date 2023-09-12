@@ -151,8 +151,6 @@ int main()
         drawTreeNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
         
 
-        //RenderText(textShader, "This is sample text", 0.01f, 0.01f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-        //RenderText(textShader, "(C) LearnOpenGL.com", 0.5f, 0.5f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
 
 
         

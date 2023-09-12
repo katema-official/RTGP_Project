@@ -15,6 +15,9 @@ TreeNode::TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int _bestPB, in
     nBoxes = 0;
     projections = nullptr;
     nProjections = 0;
+    falseBoxes = nullptr;
+    nFalseBoxes = 0;
+
     remainingQuantities = _remainingQuantities;
 }
 
@@ -51,6 +54,13 @@ void TreeNode::setProjections(std::vector<Projection*> _projectionsVector)
     copy(_projectionsVector.begin(), _projectionsVector.end(), projections);
 }
 
+void TreeNode::setFalseBoxes(std::vector<Box*> _boxesVector)
+{
+    nFalseBoxes = _boxesVector.size();
+    falseBoxes = (Box**) malloc(nFalseBoxes * sizeof(Box*));
+    copy(_boxesVector.begin(), _boxesVector.end(), falseBoxes);
+}
+
 void TreeNode::printTreeNode()
 {
     std::cout << "Node ID: " << nodeID << std::endl;
@@ -77,6 +87,12 @@ void TreeNode::printTreeNode()
     for(int i = 0; i < nProjections; i++)
     {
         projections[i]->printProjectionInfo();
+    }
+
+    std::cout << "False boxes: " << std::endl;
+    for(int i = 0; i < nFalseBoxes; i++)
+    {
+        falseBoxes[i]->printBoxInfo();
     }
 }
 

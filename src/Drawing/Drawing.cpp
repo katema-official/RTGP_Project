@@ -263,7 +263,7 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
 
     
     float rescaleTextID = 0.25;
-    for(int i = 0; i < treeNode->nBoxes; i++)   //treeNode->nBoxes
+    for(int i = 0; i < treeNode->nBoxes; i++)
     {
         Box* thisBox = treeNode->boxes[i];
 
@@ -271,8 +271,6 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
         int ID = thisBox->ID;
 
         drawBoxShape(boxShader, boxBuffers, coords.x, coords.y, coords.z, coords.w, getColorFromID(ID));
-
-        float minDim = thisBox->xlen < thisBox->ylen ? thisBox->xlen : thisBox->ylen;
         
         float xDiff = coords.z - coords.x;
         float yDiff = coords.w - coords.y;
@@ -280,6 +278,16 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
         float yText = coords.y + (yDiff / 3.0);
 
         RenderText(textShader, std::to_string(ID), xText, yText, rescaleTextID, textColor);
+    }
+
+    glm::vec3 colorFalseBox = glm::vec3(1.0, 1.0, 1.0);
+    for(int i = 0; i < treeNode->nFalseBoxes; i++)
+    {
+        Box* thisBox = treeNode->falseBoxes[i];
+
+        glm::vec4 coords = fromInputBoxToRelativeCoordinates(thisBox, wC, hC, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
+
+        drawBoxShape(boxShader, boxBuffers, coords.x, coords.y, coords.z, coords.w, colorFalseBox);
     }
 
     for(int i = 0; i < treeNode->nProjections; i++)
@@ -324,23 +332,6 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
         }
     }
 
-    /*
-    Character ch = Characters['a'];
-    float h = ch.Size.y * scalingQuantitiesText;
-    std::cout << "h = " << h << std::endl;
-    glm::vec2 quantitiesInitialCoords = getRemainingQuantities_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
-    RenderText(textShader, "0: ", quantitiesInitialCoords.x, quantitiesInitialCoords.y, scalingQuantitiesText, textColor);
-
-    float x = quantitiesInitialCoords.x * SCR_WIDTH;
-    float y = quantitiesInitialCoords.y * SCR_HEIGHT;
-    float xpos = x + ch.Bearing.x * scalingQuantitiesText;
-    float ypos = y - (ch.Size.y - ch.Bearing.y) * scalingQuantitiesText;
-
-    float w = ch.Size.x * scalingQuantitiesText;
-    h = ch.Size.y * scalingQuantitiesText;
-
-    std::cout << "x = " << xpos << ", y = " << ypos << ", w = " << w << ", h = " << h << std::endl;
-    */
 
 }
 
