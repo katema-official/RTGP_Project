@@ -18,5 +18,5 @@ void RenderText(Shader& shader, std::string text, float x, float y, float scale,
 float* HSVtoRGB(float h, float s, float v);
 
 //function that generates an unique color from an integer ID
-float* getColorFromID(int ID);
+glm::vec3 getColorFromID(int ID);
 

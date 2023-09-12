@@ -81,6 +81,17 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
         getline(infoFile, line);
         int levelInTree = stoi(line);
 
+        getline(infoFile, line);
+        std::vector<int> remainingQuantities;
+        std::stringstream ss(line);
+        std::string s;
+        const char delim = ' ';
+        while(getline(ss, s, delim))
+        {
+            remainingQuantities.push_back(stoi(s));
+        }
+
+
         bool finishedReadingBoxes = false;
         std::vector<Box*> boxesPlaced;
         while(!finishedReadingBoxes)
@@ -132,7 +143,7 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
         }
         
         
-        TreeNode* newTreeNode = new TreeNode(nodeID, fatherID, PB, DB, bestPB, levelInTree);
+        TreeNode* newTreeNode = new TreeNode(nodeID, fatherID, PB, DB, bestPB, levelInTree, remainingQuantities);
         newTreeNode->setBoxes(boxesPlaced);
         newTreeNode->setProjections(projections);
         treeNodesVector.push_back(newTreeNode);

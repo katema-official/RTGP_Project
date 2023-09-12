@@ -16,8 +16,9 @@ class TreeNode
         int nBoxes;
         Projection** projections;
         int nProjections;
+        std::vector<int> remainingQuantities;
 
-        TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int bestPB, int _level);
+        TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int bestPB, int _level, std::vector<int> remainingQuantities);
 
         ~TreeNode();
 

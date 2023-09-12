@@ -2,7 +2,7 @@
 
 #include "../classes/Box.h"
 #include "../classes/Projection.h"
-#include "../other/other.h"
+#include "../Drawing/Drawing.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -299,3 +299,12 @@ glm::vec2 getContainerDimensions_DYNAMIC_Coordinates(float maxPortionDedicatedTo
     float xOffset_3 = maxPortionDedicatedToContainer + 0.01;
     return glm::vec2(xOffset_3, 0 + yOffset_2 * 2 - 0.04);
 }
+
+
+glm::vec2 getRemainingQuantities_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer)
+{
+    float firstHeight = 1.0 - 0.1;
+    float xOffset = maxPortionDedicatedToContainer + 0.01;
+    return glm::vec2(xOffset, firstHeight);
+}
+

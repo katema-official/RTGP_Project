@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "other.h"
+#include "Drawing.h"
 #include "../utils/utils.h"
 #include "../MeaningfulCoordinates/MeaningfulCoordinates.h"
 #include "../classes/TreeNode.h"
@@ -18,8 +18,9 @@
 
 extern unsigned int SCR_WIDTH;
 extern unsigned int SCR_HEIGHT;
-
 extern int fontSize;
+extern std::map<GLchar, Character> Characters;
+extern float scalingQuantitiesText;
 
 glm::vec2 getContainerEffectiveDimensions(int wContainer, int hContainer, float maxPortionDedicatedToContainer)
 {
@@ -156,6 +157,16 @@ unsigned int* getBuffersToDrawBoxShape()
 
 void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, float x1, float y1, glm::vec3 color)
 {
+    if(x0 < 0 || x0 > 1 ||
+        y0 < 0 || y0 > 1 ||
+        x1 < 0 || x1 > 1 ||
+        y1 < 0 || y1 > 1
+    )
+    {
+        std::cout << "ERROR::drawBoxShape: data not between 0 and 1" << std::endl;
+        exit;
+    }
+
     x0 = x0*2 - 1;
     y0 = y0*2 - 1;
     x1 = x1*2 - 1;
@@ -258,10 +269,8 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
 
         glm::vec4 coords = fromInputBoxToRelativeCoordinates(thisBox, wC, hC, wContainer, hContainer, wThickness, hThickness, maxPortionDedicatedToContainer);
         int ID = thisBox->ID;
-        float* colorsArray = getColorFromID(ID);
-        glm::vec3 color = glm::vec3(colorsArray[0], colorsArray[1], colorsArray[2]);
 
-        drawBoxShape(boxShader, boxBuffers, coords.x, coords.y, coords.z, coords.w, color);
+        drawBoxShape(boxShader, boxBuffers, coords.x, coords.y, coords.z, coords.w, getColorFromID(ID));
 
         float minDim = thisBox->xlen < thisBox->ylen ? thisBox->xlen : thisBox->ylen;
         
@@ -283,6 +292,44 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
             drawBoxShape(boxShader, boxBuffers, line.x, line.y, line.z, line.w, textColor);
         }
     }
+
+    Character ch = Characters['0'];
+    float w = ch.Size.x * scalingQuantitiesText;
+    float h = ch.Size.y * scalingQuantitiesText;
+    glm::vec2 quantitiesInitialCoords = getRemainingQuantities_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
+    float x = quantitiesInitialCoords.x;
+    float y = quantitiesInitialCoords.y;
+    int index = 0;
+
+    float wAdd = Characters[':'].Size.x * scalingQuantitiesText + 0.003;
+    for(int i : treeNode->remainingQuantities)
+    {
+        int q = i;
+        int ID_len = std::to_string(index).length();
+        std::string actualText = std::to_string(index) + ": " + std::to_string(q);
+        drawBoxShape(boxShader, boxBuffers, x, y, x + (((w + wAdd) * ID_len) / SCR_WIDTH), y + (h / SCR_HEIGHT), getColorFromID(index));
+        RenderText(textShader, actualText, x, y, scalingQuantitiesText, textColor);
+        index++;
+        y -= (h / SCR_HEIGHT) * 1.3;
+    }
+
+    /*
+    Character ch = Characters['a'];
+    float h = ch.Size.y * scalingQuantitiesText;
+    std::cout << "h = " << h << std::endl;
+    glm::vec2 quantitiesInitialCoords = getRemainingQuantities_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
+    RenderText(textShader, "0: ", quantitiesInitialCoords.x, quantitiesInitialCoords.y, scalingQuantitiesText, textColor);
+
+    float x = quantitiesInitialCoords.x * SCR_WIDTH;
+    float y = quantitiesInitialCoords.y * SCR_HEIGHT;
+    float xpos = x + ch.Bearing.x * scalingQuantitiesText;
+    float ypos = y - (ch.Size.y - ch.Bearing.y) * scalingQuantitiesText;
+
+    float w = ch.Size.x * scalingQuantitiesText;
+    h = ch.Size.y * scalingQuantitiesText;
+
+    std::cout << "x = " << xpos << ", y = " << ypos << ", w = " << w << ", h = " << h << std::endl;
+    */
 
 }
 

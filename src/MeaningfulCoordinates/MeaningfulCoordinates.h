@@ -49,5 +49,6 @@ glm::vec2 getPB_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);
 glm::vec2 getDB_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);
 glm::vec2 getBestPB_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);
 glm::vec2 getContainerDimensions_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);
+glm::vec2 getRemainingQuantities_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);
 
 

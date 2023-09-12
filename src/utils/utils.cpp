@@ -22,14 +22,7 @@ extern unsigned int VAO_Text, VBO_Text;
 //******************************** TEXT RENDERING *********************************
 //*********************************************************************************
 
-/// Holds all state information relevant to a character as loaded using FreeType
-struct Character {
-    unsigned int TextureID; // ID handle of the glyph texture
-    glm::ivec2   Size;      // Size of glyph
-    glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
-    unsigned int Advance;   // Horizontal offset to advance to next glyph
-};
-std::map<GLchar, Character> Characters;
+extern std::map<GLchar, Character> Characters;
 
 
 
@@ -248,7 +241,7 @@ float* HSVtoRGB(float h, float s, float v)
     return rgb;
 }
 
-float* getColorFromID(int ID)
+glm::vec3 getColorFromID(int ID)
 {
 	int H = (49 * ID) % 360;
 	float offset = 1.0f / ((float) ID + 1);
@@ -269,7 +262,7 @@ float* getColorFromID(int ID)
 	float V = 1.0f - offset;
 
 	float* rgb = HSVtoRGB(H, S, V);
-	return rgb;
+    return glm::vec3(rgb[0], rgb[1], rgb[2]);
 }
 
 

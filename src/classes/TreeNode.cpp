@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-TreeNode::TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int _bestPB, int _level)
+TreeNode::TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int _bestPB, int _level, std::vector<int> _remainingQuantities)
 {
     nodeID = _nodeID;
     fatherID = _fatherID;
@@ -15,6 +15,7 @@ TreeNode::TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int _bestPB, in
     nBoxes = 0;
     projections = nullptr;
     nProjections = 0;
+    remainingQuantities = _remainingQuantities;
 }
 
 TreeNode::~TreeNode()
@@ -57,6 +58,14 @@ void TreeNode::printTreeNode()
     std::cout << "Level in tree: " << level << std::endl;
     std::cout << "PB: " << PB << std::endl;
     std::cout << "DB: " << DB << std::endl;
+    std::cout << "Best PB so far: " << bestPB << std::endl;
+
+    std::cout << "Remaining quantities: " << std::endl;
+    for(int q : remainingQuantities)
+    {
+        std::cout << q << " ";
+    }
+    std::cout << std::endl;
 
     std::cout << "Boxes: " << std::endl;
     for(int i = 0; i < nBoxes; i++)

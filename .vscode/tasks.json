@@ -13,7 +13,7 @@
                 "-L${workspaceFolder}",
                 "${workspaceFolder}/src/\\*.cpp",
                 "${workspaceFolder}/src/glad.c",
-                "${workspaceFolder}/src/other/\\*.cpp",
+                "${workspaceFolder}/src/Drawing/\\*.cpp",
                 "${workspaceFolder}/src/MeaningfulCoordinates/\\*.cpp",
                 "${workspaceFolder}/src/InputReading/\\*.cpp",
                 "${workspaceFolder}/src/classes/\\*.cpp",
