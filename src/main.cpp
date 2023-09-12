@@ -242,11 +242,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
 
-    if(key == GLFW_KEY_LEFT_SHIFT && action == GLFW_PRESS)
+    if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_PRESS)
     {
         shiftPressed = true;
     }
-    if(key == GLFW_KEY_LEFT_SHIFT && action == GLFW_RELEASE)
+    if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_RELEASE)
     {
         shiftPressed = false;
     }
