@@ -69,9 +69,11 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
     while (infoFile.peek() != EOF) {
 
         getline(infoFile, line);
-        int nodeID = stoi(line);
+        int explorationID = stoi(line);
         getline(infoFile, line);
         int fatherID = stoi(line);
+        getline(infoFile, line);
+        int creationID = stoi(line);
         getline(infoFile, line);
         int PB = stoi(line);
         getline(infoFile, line);
@@ -168,7 +170,7 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
         }
         
         
-        TreeNode* newTreeNode = new TreeNode(nodeID, fatherID, PB, DB, bestPB, levelInTree, remainingQuantities);
+        TreeNode* newTreeNode = new TreeNode(explorationID, fatherID, creationID, PB, DB, bestPB, levelInTree, remainingQuantities);
         newTreeNode->setBoxes(boxesPlaced);
         newTreeNode->setProjections(projections);
         newTreeNode->setFalseBoxes(falseBoxesPlaced);

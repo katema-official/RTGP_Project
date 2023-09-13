@@ -33,7 +33,8 @@ std::vector<glm::vec4> getProjectionAsDottedLine(Projection* proj,
 
 //functions to obtain the x, y coordinates of the static lines of text, like "Node ID", "Father ID"...
 //In this way, if one wants to modify them, it only has to touch these functions
-glm::vec2 getNodeId_STATIC_Coordinates(float maxPortionDedicatedToContainer);
+glm::vec2 getNodeExplorationId_STATIC_Coordinates(float maxPortionDedicatedToContainer);
+glm::vec2 getNodeCreationId_STATIC_Coordinates(float maxPortionDedicatedToContainer);
 glm::vec2 getFatherId_STATIC_Coordinates(float maxPortionDedicatedToContainer);
 glm::vec2 getLevelInTree_STATIC_Coordinates(float maxPortionDedicatedToContainer);
 glm::vec2 getPB_STATIC_Coordinates(float maxPortionDedicatedToContainer);
@@ -42,7 +43,8 @@ glm::vec2 getBestPB_STATIC_Coordinates(float maxPortionDedicatedToContainer);
 glm::vec4 getContainerDimensions_STATIC_Coordinates(float maxPortionDedicatedToContainer);  //vec4 because the first two coordinates are for "Container", the latter two for "dimensions: "
 
 //functions to obtain the x,y coordinates of the dynamic lines of text.
-glm::vec2 getNodeId_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);
+glm::vec2 getNodeExplorationId_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);
+glm::vec2 getNodeCreationId_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);
 glm::vec2 getFatherId_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);
 glm::vec2 getLevelInTree_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);
 glm::vec2 getPB_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer);

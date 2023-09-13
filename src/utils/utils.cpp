@@ -262,7 +262,9 @@ glm::vec3 getColorFromID(int ID)
 	float V = 1.0f - offset;
 
 	float* rgb = HSVtoRGB(H, S, V);
-    return glm::vec3(rgb[0], rgb[1], rgb[2]);
+    glm::vec3 ret = glm::vec3(rgb[0], rgb[1], rgb[2]);
+    delete rgb;
+    return ret;
 }
 
 

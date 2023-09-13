@@ -3,10 +3,11 @@
 #include <iostream>
 
 
-TreeNode::TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int _bestPB, int _level, std::vector<int> _remainingQuantities)
+TreeNode::TreeNode(int _explorationID, int _fatherID, int _creationID, int _PB, int _DB, int _bestPB, int _level, std::vector<int> _remainingQuantities)
 {
-    nodeID = _nodeID;
+    explorationID = _explorationID;
     fatherID = _fatherID;
+    creationID = _creationID;
     PB = _PB;
     DB = _DB;
     bestPB = _bestPB;
@@ -63,7 +64,8 @@ void TreeNode::setFalseBoxes(std::vector<Box*> _boxesVector)
 
 void TreeNode::printTreeNode()
 {
-    std::cout << "Node ID: " << nodeID << std::endl;
+    std::cout << "Exploration ID: " << explorationID << std::endl;
+    std::cout << "Creation ID: " << creationID << std::endl;
     std::cout << "Father ID: " << fatherID << std::endl;
     std::cout << "Level in tree: " << level << std::endl;
     std::cout << "PB: " << PB << std::endl;

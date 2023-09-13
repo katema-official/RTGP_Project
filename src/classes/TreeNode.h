@@ -6,8 +6,9 @@
 class TreeNode
 {
     public:
-        int nodeID;
+        int explorationID;
         int fatherID;
+        int creationID;
         int PB;
         int DB;
         int bestPB;
@@ -20,7 +21,7 @@ class TreeNode
         int nFalseBoxes;
         std::vector<int> remainingQuantities;
 
-        TreeNode(int _nodeID, int _fatherID, int _PB, int _DB, int bestPB, int _level, std::vector<int> remainingQuantities);
+        TreeNode(int _explorationID, int _fatherID, int _creationID, int _PB, int _DB, int bestPB, int _level, std::vector<int> remainingQuantities);
 
         ~TreeNode();
 

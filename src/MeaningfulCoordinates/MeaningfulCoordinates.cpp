@@ -192,28 +192,36 @@ std::vector<glm::vec4> getProjectionAsDottedLine(Projection* proj,
 
 
 
-glm::vec2 getNodeId_STATIC_Coordinates(float maxPortionDedicatedToContainer)
+glm::vec2 getNodeExplorationId_STATIC_Coordinates(float maxPortionDedicatedToContainer)
 {
     float remainingVerticalSpace = 1.0f - maxPortionDedicatedToContainer;
-    float yOffset_1 = remainingVerticalSpace / 7;
+    float yOffset_1 = remainingVerticalSpace / 9;
     float xOffset_1 = 0.02;
     return glm::vec2(xOffset_1, 1.0f - yOffset_1*2);
+}
+
+glm::vec2 getNodeCreationId_STATIC_Coordinates(float maxPortionDedicatedToContainer)
+{
+    float remainingVerticalSpace = 1.0f - maxPortionDedicatedToContainer;
+    float yOffset_1 = remainingVerticalSpace / 9;
+    float xOffset_1 = 0.02;
+    return glm::vec2(xOffset_1, 1.0f - yOffset_1*4);
 }
 
 glm::vec2 getFatherId_STATIC_Coordinates(float maxPortionDedicatedToContainer)
 {
     float remainingVerticalSpace = 1.0f - maxPortionDedicatedToContainer;
-    float yOffset_1 = remainingVerticalSpace / 7;
+    float yOffset_1 = remainingVerticalSpace / 9;
     float xOffset_1 = 0.02;
-    return glm::vec2(xOffset_1, 1.0f - yOffset_1*4);
+    return glm::vec2(xOffset_1, 1.0f - yOffset_1*6);
 }
 
 glm::vec2 getLevelInTree_STATIC_Coordinates(float maxPortionDedicatedToContainer)
 {
     float remainingVerticalSpace = 1.0f - maxPortionDedicatedToContainer;
-    float yOffset_1 = remainingVerticalSpace / 7;
+    float yOffset_1 = remainingVerticalSpace / 9;
     float xOffset_1 = 0.02;
-    return glm::vec2(xOffset_1, 1.0f - yOffset_1*6);
+    return glm::vec2(xOffset_1, 1.0f - yOffset_1*8);
 }
 
 glm::vec2 getPB_STATIC_Coordinates(float maxPortionDedicatedToContainer)
@@ -250,24 +258,31 @@ glm::vec4 getContainerDimensions_STATIC_Coordinates(float maxPortionDedicatedToC
 
 
 
-glm::vec2 getNodeId_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer)
+glm::vec2 getNodeExplorationId_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer)
 {
-    glm::vec2 ret = getNodeId_STATIC_Coordinates(maxPortionDedicatedToContainer);
-    ret.x += 0.12;
+    glm::vec2 ret = getNodeExplorationId_STATIC_Coordinates(maxPortionDedicatedToContainer);
+    ret.x += 0.14;
+    return ret;
+}
+
+glm::vec2 getNodeCreationId_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer)
+{
+    glm::vec2 ret = getNodeCreationId_STATIC_Coordinates(maxPortionDedicatedToContainer);
+    ret.x += 0.14;
     return ret;
 }
 
 glm::vec2 getFatherId_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer)
 {
     glm::vec2 ret = getFatherId_STATIC_Coordinates(maxPortionDedicatedToContainer);
-    ret.x += 0.12;
+    ret.x += 0.14;
     return ret;
 }
 
 glm::vec2 getLevelInTree_DYNAMIC_Coordinates(float maxPortionDedicatedToContainer)
 {
     glm::vec2 ret = getLevelInTree_STATIC_Coordinates(maxPortionDedicatedToContainer);
-    ret.x += 0.12;
+    ret.x += 0.14;
     return ret;
 }
 
