@@ -107,7 +107,6 @@ int main()
     std::cout << "Tree nodes informations: " << std::endl;
     for(TreeNode* t : treeNodesVector) t->printTreeNode();*/
 
-
     
     unsigned int* buffersForBox = getBuffersToDrawBoxShape();
 

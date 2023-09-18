@@ -28,7 +28,7 @@ std::vector<glm::vec4> getProjectionAsDottedLine(Projection* proj,
                                             float wContainer, float hContainer, 
                                             float wThickness, float hThickness,
                                             float maxPortionDedicatedToContainer,
-                                            int lengthSingleDottedLine,
+                                            float lengthSingleDottedLine,
                                             float thicknessProjection);
 
 //functions to obtain the x, y coordinates of the static lines of text, like "Node ID", "Father ID"...

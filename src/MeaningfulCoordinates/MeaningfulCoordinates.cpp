@@ -87,7 +87,7 @@ std::vector<glm::vec4> getProjectionAsDottedLine(Projection* proj,
                                             float wContainer, float hContainer, 
                                             float wThickness, float hThickness,
                                             float maxPortionDedicatedToContainer,
-                                            int lengthSingleDottedLine,
+                                            float lengthSingleDottedLine,
                                             float thicknessProjection)
 {
 
@@ -119,7 +119,7 @@ std::vector<glm::vec4> getProjectionAsDottedLine(Projection* proj,
 
     if(verticalProjection)
     {
-        int remainingSpaceToCover = abs(proj->y1 - proj->y2);
+        float remainingSpaceToCover = abs(proj->y1 - proj->y2);
         int yInitial = proj->y1 < proj->y2 ? proj->y1 : proj->y2;
         x0 = (float) proj->x1 - verticalProjectionThickness / 2.0;
         y0 = (float) yInitial;
@@ -152,7 +152,7 @@ std::vector<glm::vec4> getProjectionAsDottedLine(Projection* proj,
     }
     else
     {
-        int remainingSpaceToCover = abs(proj->x1 - proj->x2);
+        float remainingSpaceToCover = abs(proj->x1 - proj->x2);
         int xInitial = proj->x1 < proj->x2 ? proj->x1 : proj->x2;
         x0 = (float) xInitial;
         y0 = (float) proj->y1 - horizontalProjectionThickness / 2.0;
