@@ -24,7 +24,7 @@ unsigned int* getBuffersToDrawBoxShape();
 
 //to draw a box given the bottom-left vertex and the upper-right one.
 //x0, y0, x1, y1 are always expressed between 0 and 1.
-void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, float x1, float y1, glm::vec3 color);
+void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, float x1, float y1, glm::vec4 color);
 
 //to draw a node of the tree
 void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
@@ -33,6 +33,9 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
                     float wThickness, float hThickness, 
                     float maxPortionDedicatedToContainer,
                     Shader& boxShader, Shader& textShader);
+
+//to temporarily draw the new "jump" (speed) factor betwee nodes (1x, 10x, 100x...)
+void drawSpeed(Shader& shader, int speed, bool updated, float _initialTimeNewSpeed, float currentTime);
 
 
 

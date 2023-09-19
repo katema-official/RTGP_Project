@@ -59,7 +59,7 @@ void drawStaticInformations(int wC, int hC,
     }
 
 
-    glm::vec3 containerColor = glm::vec3(0.0, 0.0, 0.0);
+    glm::vec4 containerColor = glm::vec4(0.0, 0.0, 0.0, 1.0);
 
     float winnerLength = wContainer > hContainer ? wContainer : hContainer;
     float loserLength =  wContainer > hContainer ? hContainer : wContainer;
@@ -157,7 +157,7 @@ unsigned int* getBuffersToDrawBoxShape()
 
 
 
-void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, float x1, float y1, glm::vec3 color)
+void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, float x1, float y1, glm::vec4 color)
 {
     if(x0 < 0 || x0 > 1 ||
         y0 < 0 || y0 > 1 ||
@@ -252,7 +252,7 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
     glm::vec2 coordsBestPB = getBestPB_DYNAMIC_Coordinates(maxPortionDedicatedToContainer);
 
 
-    glm::vec3 textColor = glm::vec3(0.0, 0.0, 0.0);
+    glm::vec4 textColor = glm::vec4(0.0, 0.0, 0.0, 1.0);
     float rescaleTextInfo = 0.125;
 
     RenderText(textShader, std::to_string(treeNode->explorationID), coordsNodeExplorationID.x, coordsNodeExplorationID.y, rescaleTextInfo, textColor);
@@ -289,7 +289,7 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
         RenderText(textShader, std::to_string(yLenInt), coords.x, yText, rescaleTextID / 3, textColor);
     }
 
-    glm::vec3 colorFalseBox = glm::vec3(1.0, 1.0, 1.0);
+    glm::vec4 colorFalseBox = glm::vec4(1.0, 1.0, 1.0, 1.0);
     for(int i = 0; i < treeNode->nFalseBoxes; i++)
     {
         Box* thisBox = treeNode->falseBoxes[i];
@@ -345,6 +345,40 @@ void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
 
 }
 
+
+
+float speedFullyVisibleDuration = 0.5f;
+float speedFadeOutDuration = 0.5f;
+float initialTimeNewSpeed = -speedFullyVisibleDuration - speedFadeOutDuration - 0.01;
+
+void drawSpeed(Shader& shader, int speed, bool updated, float _initialTimeNewSpeed, float currentTime)
+{
+    if(updated)
+    {
+        initialTimeNewSpeed = _initialTimeNewSpeed;
+        return;
+    }
+
+    if(currentTime > initialTimeNewSpeed + speedFullyVisibleDuration + speedFadeOutDuration) return;
+    
+    glm::vec4 colorText;
+    if(currentTime <= initialTimeNewSpeed + speedFullyVisibleDuration)
+    {
+        colorText = glm::vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    else if(currentTime <= initialTimeNewSpeed + speedFullyVisibleDuration + speedFadeOutDuration)
+    {
+        float a = 0.0f;
+        float b = 1.0f;
+        float f = 1 - ((currentTime - initialTimeNewSpeed - speedFullyVisibleDuration) / speedFadeOutDuration);
+        float transparency = (a * (1.0 - f) + (b * f));
+        colorText = glm::vec4(0.0, 0.0, 0.0, transparency);
+    }
+
+    RenderText(shader, std::to_string(speed) + "x", 0.005, 0.025, 1, colorText);
+    
+    return;
+}
 
 
 

@@ -68,6 +68,11 @@ public:
         glDeleteShader(vertex);
         glDeleteShader(fragment);
     }
+
+    Shader()
+    {
+        //default constructor useful when we don't really want to build a shader, but we have to pass one to a function
+    }
     // activate the shader
     // ------------------------------------------------------------------------
     void use()

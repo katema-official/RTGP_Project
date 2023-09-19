@@ -121,7 +121,7 @@ Shader initTextRendering(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)
 
 // render line of text
 // -------------------
-void RenderText(Shader& shader, std::string text, float x, float y, float scale, glm::vec3 color)
+void RenderText(Shader& shader, std::string text, float x, float y, float scale, glm::vec4 color)
 {
 	if(x < 0 || x > 1 ||
 		y < 0 || y > 1)
@@ -140,7 +140,7 @@ void RenderText(Shader& shader, std::string text, float x, float y, float scale,
 
     // activate corresponding render state	
     shader.use();
-    glUniform3f(glGetUniformLocation(shader.ID, "textColor"), color.x, color.y, color.z);
+    glUniform4f(glGetUniformLocation(shader.ID, "textColor"), color.x, color.y, color.z, color.w);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO_Text);
 
@@ -241,7 +241,7 @@ float* HSVtoRGB(float h, float s, float v)
     return rgb;
 }
 
-glm::vec3 getColorFromID(int ID)
+glm::vec4 getColorFromID(int ID)
 {
 	int H = (49 * ID) % 360;
 	float offset = 1.0f / ((float) ID + 1);
@@ -262,7 +262,7 @@ glm::vec3 getColorFromID(int ID)
 	float V = 1.0f - offset;
 
 	float* rgb = HSVtoRGB(H, S, V);
-    glm::vec3 ret = glm::vec3(rgb[0], rgb[1], rgb[2]);
+    glm::vec4 ret = glm::vec4(rgb[0], rgb[1], rgb[2], 1.0);
     delete rgb;
     return ret;
 }

@@ -40,7 +40,12 @@ int CURRENT_VAO = 0;
 
 int currentNodeIndex = 0;
 int numberOfNodes;
+int nodesToAdvance = 1;
 
+
+
+float lastFrame = 0.0;
+float deltaTime = 0.0;
 
 int main()
 {
@@ -129,6 +134,9 @@ int main()
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
         // input
         // -----
         processInput(window);
@@ -153,6 +161,7 @@ int main()
 
 
         
+        drawSpeed(textShader, nodesToAdvance, false, 0.0, currentFrame);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -197,17 +206,34 @@ void processInput(GLFWwindow* window)
     {
         if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         {
-            if(currentNodeIndex < numberOfNodes - 1)
+            /*if(currentNodeIndex < numberOfNodes - 1)
             {
                 currentNodeIndex += 1;
+            }*/
+            if(currentNodeIndex + nodesToAdvance < numberOfNodes)
+                {
+                    currentNodeIndex += nodesToAdvance;
+                }
+                else
+                {
+                    currentNodeIndex = numberOfNodes - 1;
+                }
             }
-        }
+        
 
         if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
         {
-            if(currentNodeIndex > 0)
+            /*if(currentNodeIndex > 0)
             {
                 currentNodeIndex -= 1;
+            }*/
+            if(currentNodeIndex - nodesToAdvance > 0)
+            {
+                currentNodeIndex -= nodesToAdvance;
+            }
+            else
+            {
+                currentNodeIndex = 0;
             }
         }
     }
@@ -241,6 +267,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
 
+    if((key == GLFW_KEY_KP_ADD || key == GLFW_KEY_PERIOD) && action == GLFW_PRESS)
+    {
+        if(nodesToAdvance < 1000000)
+        {   
+            nodesToAdvance *= 10;
+            Shader s;
+            drawSpeed(s, nodesToAdvance, true, glfwGetTime(), 0.0);
+        }
+    }
+
+    if((key == GLFW_KEY_KP_SUBTRACT || key == GLFW_KEY_COMMA) && action == GLFW_PRESS)
+    {
+        if(nodesToAdvance > 1)
+        {
+            nodesToAdvance /= 10;
+            Shader s;
+            drawSpeed(s, nodesToAdvance, true, glfwGetTime(), 0.0);
+        }
+    }
+
     if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_PRESS)
     {
         shiftPressed = true;
@@ -254,17 +300,25 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
         {
-            if(currentNodeIndex < numberOfNodes - 1)
+            if(currentNodeIndex + nodesToAdvance < numberOfNodes)
             {
-                currentNodeIndex += 1;
+                currentNodeIndex += nodesToAdvance;
+            }
+            else
+            {
+                currentNodeIndex = numberOfNodes - 1;
             }
         }
 
         if(key == GLFW_KEY_LEFT && action == GLFW_PRESS)
         {
-            if(currentNodeIndex > 0)
+            if(currentNodeIndex - nodesToAdvance > 0)
             {
-                currentNodeIndex -= 1;
+                currentNodeIndex -= nodesToAdvance;
+            }
+            else
+            {
+                currentNodeIndex = 0;
             }
         }
     }
