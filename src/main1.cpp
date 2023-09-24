@@ -105,8 +105,8 @@ int main1()
     int hContainer = 0;
     std::vector<Box*> obstaclesVector;
     std::vector<TreeNode*> treeNodesVector;
-    float wThickness = 0.02;
     float hThickness = 0.012;
+    float wThickness = hThickness * ((float) SCR_WIDTH) / ((float) SCR_HEIGHT); //0.02
     float maxPortionDedicatedToContainer = 0.8;
 
     readNodesInformations(wContainer, hContainer, obstaclesVector, treeNodesVector);

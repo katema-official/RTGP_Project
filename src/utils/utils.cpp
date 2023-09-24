@@ -34,7 +34,7 @@ Shader initTextRendering(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)
 	Shader textShader("shader_text.vs", "shader_text.fs");
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
     textShader.use();
-    glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    textShader.setMat4("projection", projection);
 
     FT_Library ft;
     if (FT_Init_FreeType(&ft))

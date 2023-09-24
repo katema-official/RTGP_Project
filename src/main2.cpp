@@ -21,6 +21,8 @@
 #include <tuple>
 #include <vector>
 
+#include <camera.h>
+
 #include <main2.h>
 
 // settings
@@ -34,14 +36,14 @@ namespace MAIN2
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow* window);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
 
 
 bool shiftPressed = false;
 
 
 
-
-int CURRENT_VAO = 0;
 
 int currentNodeIndex = 0;
 int numberOfNodes;
@@ -51,6 +53,9 @@ int nodesToAdvance = 1;
 
 float lastFrame = 0.0;
 float deltaTime = 0.0;
+
+// camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 int main2()
 {
@@ -76,7 +81,7 @@ int main2()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
+    glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
 
 
@@ -93,10 +98,10 @@ int main2()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader boxShader("shader_standard.vs", "shader_standard.fs"); // you can name your shader files however you like
+    Shader nodeInTreeShader("shader_node_in_tree.vs", "shader_node_in_tree.fs");
 
 
-
+    
 
 
     numberOfNodes = readNodesNumber();
@@ -118,10 +123,9 @@ int main2()
     for(TreeNode* t : treeNodesVector) t->printTreeNode();*/
 
     
-    unsigned int* buffersForBox = getBuffersToDrawBoxShape();
+    //unsigned int* buffersForBox = getBuffersToDrawBoxShape();
+    unsigned int* buffersForNodeInTree = getBuffersWithDataToDrawRectangleNode();
 
-
-    unsigned int* VAOs = getVAOs();
 
     glBindVertexArray(0);
 
@@ -134,6 +138,9 @@ int main2()
     wContainerTrue = dimsTrue.x;
     hContainerTrue = dimsTrue.y;
 
+
+    //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
+    //nodeInTreeShader.setMat4("projection", projection);
 
     // render loop
     // -----------
@@ -158,11 +165,47 @@ int main2()
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);   //12 is the total number of vertices used, basically 3 * the number of triangles used
         */
 
-        drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
-
-        drawTreeNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
         
 
+        //drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
+
+        //drawTreeNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
+        
+
+        //############################################################
+
+        nodeInTreeShader.use();
+
+        //std::cout << "CAMERA ZOOM: " << camera.Zoom << std::endl;
+        //glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        //nodeInTreeShader.setMat4("projection", projection);
+
+        float aspect = (float)SCR_WIDTH/SCR_HEIGHT;
+        glm::mat4 projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.0f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
+
+        //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT), -1000.0f, 1000.0f);
+        nodeInTreeShader.setMat4("projection", projection);
+
+        // camera/view transformation
+        glm::mat4 view = camera.GetViewMatrix();
+        nodeInTreeShader.setMat4("view", view);
+
+        glm::vec3 nodePosition(0.2f, 0.0f, -0.5f);
+        glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        model = glm::translate(model, nodePosition);
+        float angle = 0.0f; //20.0f * deltaTime;
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
+        nodeInTreeShader.setMat4("model", model);
+
+        
+        glBindVertexArray(buffersForNodeInTree[0]);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        //############################################################
+
+        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+        glBindVertexArray(0);
 
 
         
@@ -192,20 +235,17 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(UPWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(DOWNWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltaTime);
     
-    /*if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        if(CURRENT_VAO == 0)
-        { 
-            CURRENT_VAO = 1;
-            std::cout << "Changed to 1" << std::endl;
-        }
-        else
-        { 
-            CURRENT_VAO = 0;
-            std::cout << "Changed to 0" << std::endl;
-        }
-    }*/
+    
 
     if(shiftPressed)
     {
@@ -256,21 +296,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_S && action == GLFW_PRESS)
-    {
-        if(CURRENT_VAO == 0)
-        { 
-            CURRENT_VAO = 1;
-            std::cout << "Changed to 1" << std::endl;
-        }
-        else
-        { 
-            CURRENT_VAO = 0;
-            std::cout << "Changed to 0" << std::endl;
-        }
-    }
-
-
 
     if((key == GLFW_KEY_KP_ADD || key == GLFW_KEY_PERIOD) && action == GLFW_PRESS)
     {
@@ -329,5 +354,27 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     
 }
+
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
