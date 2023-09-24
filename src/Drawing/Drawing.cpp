@@ -22,6 +22,10 @@ extern int fontSize;
 extern std::map<GLchar, Character> Characters;
 extern float scalingQuantitiesText;
 
+//############################################################################
+//################# FUNCTIONS RELATIVE TO THE NODES RENDERING ################
+//############################################################################
+
 glm::vec2 getContainerEffectiveDimensions(int wContainer, int hContainer, float maxPortionDedicatedToContainer)
 {
     float wContainerTrue = (float) wContainer;
@@ -379,6 +383,54 @@ void drawSpeed(Shader& shader, int speed, bool updated, float _initialTimeNewSpe
     
     return;
 }
+
+
+
+
+
+
+//############################################################################
+//################# FUNCTIONS RELATIVE TO THE TREE RENDERING #################
+//############################################################################
+
+unsigned int* getBuffersWithDataToDrawRectangleNode()
+{
+    unsigned int* buffers = new unsigned int[3]; //there will be the VAO, the VBO and the EBO
+
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 2,                //this works fine under the assumption that in the VBO the vertices
+        1, 2, 3                 //are ordered like this: bottom-left, bottom-right, top-left, top-right
+    };
+
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        -0.5f, 0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f
+    };
+
+    glGenVertexArrays(1, &buffers[0]);
+    glGenBuffers(1, &buffers[1]);
+    glGenBuffers(1, &buffers[2]);
+    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glBindVertexArray(buffers[0]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[2]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    return buffers;
+}
+
+
 
 
 

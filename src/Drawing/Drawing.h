@@ -43,6 +43,14 @@ void drawSpeed(Shader& shader, int speed, bool updated, float _initialTimeNewSpe
 
 
 
+//to get the VAO, VBO and EBO (where the VBO is already filled with the four vertices)
+//to draw a square, that will represent a node in the tree representation
+unsigned int* getBuffersWithDataToDrawRectangleNode();
+
+
+
+
+
 unsigned int* getVAOs();
 
 std::tuple<unsigned int, int> swapRectangles(int i, float vertices[], unsigned int indices[]);
