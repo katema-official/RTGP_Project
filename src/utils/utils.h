@@ -14,7 +14,7 @@ void RenderText(Shader& shader, std::string text, float x, float y, float scale,
 
 
 
-void RenderTextInSpace(Shader& shader, std::string text, float x, float y, float scale, glm::vec4 color);
+void RenderTextInSpace(Shader& shader, std::string text, float scale, glm::vec4 color);
 
 
 

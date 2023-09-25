@@ -11,6 +11,7 @@
 
 #include <shader_s.h>
 #include <settings.h>
+#include <camera.h>
 
 extern unsigned int SCR_WIDTH;
 extern unsigned int SCR_HEIGHT;
@@ -26,8 +27,6 @@ extern unsigned int VAO_Text, VBO_Text;
 
 extern std::map<GLchar, Character> Characters;
 
-
-
 //to initialize all the things that allow to perform text rendering
 Shader initTextRendering(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)
 {
@@ -35,6 +34,8 @@ Shader initTextRendering(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)
     // ----------------------------
 	Shader textShader("shader_text.vs", "shader_text.fs");
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
+    //float aspect = ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
+    //glm::mat4 projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.1f, 1000.0f);
     textShader.use();
     textShader.setMat4("projection", projection);
 
@@ -110,10 +111,14 @@ Shader initTextRendering(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)
 
     glBindVertexArray(VAO_Text);
     glBindBuffer(GL_ARRAY_BUFFER, VBO_Text);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 5, NULL, GL_DYNAMIC_DRAW);
 
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    //position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    //texture attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -158,14 +163,14 @@ void RenderText(Shader& shader, std::string text, float x, float y, float scale,
         float w = ch.Size.x * scale;
         float h = ch.Size.y * scale;
         // update VBO for each character
-        float vertices[6][4] = {
-            { xpos,     ypos + h,   0.0f, 0.0f },            
-            { xpos,     ypos,       0.0f, 1.0f },
-            { xpos + w, ypos,       1.0f, 1.0f },
+        float vertices[6][5] = {
+            { xpos,     ypos + h, 0.0f,   0.0f, 0.0f },            
+            { xpos,     ypos,     0.0f,   0.0f, 1.0f },
+            { xpos + w, ypos,     0.0f,   1.0f, 1.0f },
 
-            { xpos,     ypos + h,   0.0f, 0.0f },
-            { xpos + w, ypos,       1.0f, 1.0f },
-            { xpos + w, ypos + h,   1.0f, 0.0f }           
+            { xpos,     ypos + h, 0.0f,   0.0f, 0.0f },
+            { xpos + w, ypos,     0.0f,   1.0f, 1.0f },
+            { xpos + w, ypos + h, 0.0f,   1.0f, 0.0f }           
         };
         // render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
@@ -192,8 +197,10 @@ void RenderText(Shader& shader, std::string text, float x, float y, float scale,
 
 // render line of text in space
 // ----------------------------
-void RenderTextInSpace(Shader& shader, std::string text, float x, float y, float scale, glm::vec4 color)
+void RenderTextInSpace(Shader& shader, std::string text, float scale, glm::vec4 color)
 {
+    float x = -0.5f;
+    float y = 0.0f;
 	// OpenGL state (for rendering text)
 	// ------------
 	glEnable(GL_CULL_FACE);
@@ -208,25 +215,29 @@ void RenderTextInSpace(Shader& shader, std::string text, float x, float y, float
 
     // iterate through all characters
     std::string::const_iterator c;
+    bool first = false;
     for (c = text.begin(); c != text.end(); c++) 
     {
         Character ch = Characters[*c];
 
-        float xpos = x + ch.Bearing.x * scale;
-        float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
-        std::cout << "xpos and ypos = " << xpos << ", " << ypos << std::endl;
+        float xpos;
+        float ypos;
+        xpos = x + ch.Bearing.x * scale;
+        ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+        //std::cout << "xpos and ypos= " << xpos << ", " << ypos << std::endl;
+        
 
         float w = ch.Size.x * scale;
         float h = ch.Size.y * scale;
         // update VBO for each character
-        float vertices[6][4] = {
-            { xpos,     ypos + h,   0.0f, 0.0f },            
-            { xpos,     ypos,       0.0f, 1.0f },
-            { xpos + w, ypos,       1.0f, 1.0f },
+        float vertices[6][5] = {
+            { xpos,     ypos + h, 0.0f,   0.0f, 0.0f },            
+            { xpos,     ypos,     0.0f,   0.0f, 1.0f },
+            { xpos + w, ypos,     0.0f,   1.0f, 1.0f },
 
-            { xpos,     ypos + h,   0.0f, 0.0f },
-            { xpos + w, ypos,       1.0f, 1.0f },
-            { xpos + w, ypos + h,   1.0f, 0.0f }           
+            { xpos,     ypos + h, 0.0f,   0.0f, 0.0f },
+            { xpos + w, ypos,     0.0f,   1.0f, 1.0f },
+            { xpos + w, ypos + h, 0.0f,   1.0f, 0.0f }           
         };
         // render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);

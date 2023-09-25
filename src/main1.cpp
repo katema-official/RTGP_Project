@@ -97,7 +97,6 @@ int main1()
 
 
 
-
     numberOfNodes = readNodesNumber();
     std::cout << "numberOfNodes = " << numberOfNodes << std::endl;
 

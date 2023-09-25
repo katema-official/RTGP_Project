@@ -158,6 +158,8 @@ int main2()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glEnable(GL_DEPTH_TEST);
         
 
         //drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
@@ -183,24 +185,31 @@ int main2()
         glm::mat4 view = camera.GetViewMatrix();
         nodeInTreeShader.setMat4("view", view);
 
-        glm::vec3 nodePosition(1.0f, 0.0f, -10.0f);
-        glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        model = glm::translate(model, nodePosition);
+        glm::vec3 nodePosition(-2.0f, 0.0f, -100.0f);
+        glm::mat4 modelNode = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        modelNode = glm::translate(modelNode, nodePosition);
         //float angle = 20 * currentFrame;
         //model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
-        nodeInTreeShader.setMat4("model", model);
+        nodeInTreeShader.setMat4("model", modelNode);
         
         glBindVertexArray(buffersForNodeInTree[0]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        //glm::vec3 nodeVec = nodePosition;
+        //nodeVec = projection * view * modelNode * nodeVec;
 
 
         textShaderInSpace.use();
         textShaderInSpace.setMat4("projection", projection);
         textShaderInSpace.setMat4("view", view);
-        textShaderInSpace.setMat4("model", model);
 
-        RenderTextInSpace(textShaderInSpace, "Pippo", nodePosition.x, nodePosition.y, 0.001, glm::vec4(0.0, 0.0, 0.0, 1.0));
+        glm::vec3 textPosition = nodePosition;
+        textPosition.z += 1.0f;
+        glm::mat4 modelText = glm::mat4(1.0f);
+        modelText = glm::translate(modelText, textPosition);
+        textShaderInSpace.setMat4("model", modelText);
+
+        RenderTextInSpace(textShaderInSpace, "Pippo", 0.001, glm::vec4(0.0, 0.0, 0.0, 1.0));
 
 
         //############################################################
