@@ -12,6 +12,12 @@ Shader initTextRendering(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT);
 void RenderText(Shader& shader, std::string text, float x, float y, float scale, glm::vec4 color);
 
 
+
+
+void RenderTextInSpace(Shader& shader, std::string text, float x, float y, float scale, glm::vec4 color);
+
+
+
 //function that converts HSV to RGB.
 //H ranges between 0 to 360. s and v range from 0 to 1.
 //Based on: https://www.cs.rit.edu/~ncs/color/t_convert.html 

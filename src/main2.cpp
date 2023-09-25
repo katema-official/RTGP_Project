@@ -55,7 +55,7 @@ float lastFrame = 0.0;
 float deltaTime = 0.0;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 25.0f));
 
 int main2()
 {
@@ -99,6 +99,7 @@ int main2()
     // build and compile our shader program
     // ------------------------------------
     Shader nodeInTreeShader("shader_node_in_tree.vs", "shader_node_in_tree.fs");
+    Shader textShaderInSpace("shader_text_in_space.vs", "shader_text_in_space.fs");
 
 
     
@@ -157,14 +158,6 @@ int main2()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // render the triangle
-        /*boxShader.use();
-        glBindVertexArray(VAOs[CURRENT_VAO]);
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);   //12 is the total number of vertices used, basically 3 * the number of triangles used
-        */
-
         
 
         //drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
@@ -181,7 +174,7 @@ int main2()
         //nodeInTreeShader.setMat4("projection", projection);
 
         float aspect = (float)SCR_WIDTH/SCR_HEIGHT;
-        glm::mat4 projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.0f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
+        glm::mat4 projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.1f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
 
         //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT), -1000.0f, 1000.0f);
         nodeInTreeShader.setMat4("projection", projection);
@@ -190,16 +183,25 @@ int main2()
         glm::mat4 view = camera.GetViewMatrix();
         nodeInTreeShader.setMat4("view", view);
 
-        glm::vec3 nodePosition(0.2f, 0.0f, -0.5f);
+        glm::vec3 nodePosition(1.0f, 0.0f, -10.0f);
         glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         model = glm::translate(model, nodePosition);
-        float angle = 0.0f; //20.0f * deltaTime;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
+        //float angle = 20 * currentFrame;
+        //model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
         nodeInTreeShader.setMat4("model", model);
-
         
         glBindVertexArray(buffersForNodeInTree[0]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+
+        textShaderInSpace.use();
+        textShaderInSpace.setMat4("projection", projection);
+        textShaderInSpace.setMat4("view", view);
+        textShaderInSpace.setMat4("model", model);
+
+        RenderTextInSpace(textShaderInSpace, "Pippo", nodePosition.x, nodePosition.y, 0.001, glm::vec4(0.0, 0.0, 0.0, 1.0));
+
 
         //############################################################
 

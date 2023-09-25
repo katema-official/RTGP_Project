@@ -19,3 +19,8 @@ struct Character {
 };
 inline std::map<GLchar, Character> Characters;
 
+
+
+
+
+
