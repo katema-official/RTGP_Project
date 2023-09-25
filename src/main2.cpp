@@ -143,6 +143,7 @@ int main2()
     //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
     //nodeInTreeShader.setMat4("projection", projection);
 
+    glEnable(GL_DEPTH_TEST);
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -159,7 +160,7 @@ int main2()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glEnable(GL_DEPTH_TEST);
+        
         
 
         //drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
@@ -170,33 +171,22 @@ int main2()
         //############################################################
 
         nodeInTreeShader.use();
-
-        //std::cout << "CAMERA ZOOM: " << camera.Zoom << std::endl;
-        //glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        //nodeInTreeShader.setMat4("projection", projection);
-
-        float aspect = (float)SCR_WIDTH/SCR_HEIGHT;
+        float aspect = ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
         glm::mat4 projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.1f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
-
-        //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT), -1000.0f, 1000.0f);
         nodeInTreeShader.setMat4("projection", projection);
 
         // camera/view transformation
         glm::mat4 view = camera.GetViewMatrix();
         nodeInTreeShader.setMat4("view", view);
 
-        glm::vec3 nodePosition(-2.0f, 0.0f, -100.0f);
-        glm::mat4 modelNode = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        glm::vec3 nodePosition(0.0f, 0.0f, -100.0f);
+        glm::mat4 modelNode = glm::mat4(1.0f);
         modelNode = glm::translate(modelNode, nodePosition);
-        //float angle = 20 * currentFrame;
-        //model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
         nodeInTreeShader.setMat4("model", modelNode);
         
         glBindVertexArray(buffersForNodeInTree[0]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        //glm::vec3 nodeVec = nodePosition;
-        //nodeVec = projection * view * modelNode * nodeVec;
 
 
         textShaderInSpace.use();
@@ -211,6 +201,32 @@ int main2()
 
         RenderTextInSpace(textShaderInSpace, "Pippo", 0.001, glm::vec4(0.0, 0.0, 0.0, 1.0));
 
+
+
+        nodeInTreeShader.use();
+
+        glm::vec3 nodePosition2(3.0f, 0.0f, -100.0f);
+        glm::mat4 modelNode2 = glm::mat4(1.0f);
+        modelNode2 = glm::translate(modelNode2, nodePosition2);
+        nodeInTreeShader.setMat4("model", modelNode2);
+        
+        glBindVertexArray(buffersForNodeInTree[0]);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+
+
+
+        textShaderInSpace.use();
+
+        textPosition = nodePosition2;
+        textPosition.z += 1.0f;
+        modelText = glm::mat4(1.0f);
+        modelText = glm::translate(modelText, textPosition);
+        textShaderInSpace.setMat4("model", modelText);
+
+        RenderTextInSpace(textShaderInSpace, "Pippo", 0.001, glm::vec4(0.0, 0.0, 0.0, 1.0));
+        
 
         //############################################################
 

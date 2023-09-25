@@ -46,8 +46,6 @@ public:
         WorldUp = up;
         Right = glm::vec3(1.0f, 0.0f, 0.0f); // glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         Up    = glm::vec3(0.0f, 1.0f, 0.0f); //glm::normalize(glm::cross(Right, Front));
-        std::cout << "UP: " << Up.x << ", " << Up.y << ", " << Up.z << std::endl;
-        std::cout << "RIGHT: " << Right.x << ", " << Right.y << ", " << Right.z << std::endl;
         //updateCameraVectors();
     }
     // constructor with scalar values
@@ -57,7 +55,6 @@ public:
         WorldUp = glm::vec3(upX, upY, upZ);
         Right = glm::vec3(1.0f, 0.0f, 0.0f); //glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         Up    = glm::vec3(0.0f, 1.0f, 0.0f); //glm::normalize(glm::cross(Right, Front));
-        //updateCameraVectors();
     }
 
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
@@ -98,14 +95,6 @@ public:
             Zoom = 500.0f;
     }
 
-private:
-    // calculates the front vector from the Camera's (updated) Euler Angles
-    void updateCameraVectors()
-    {
-        //re-calculate the Right and Up vector
-        Right = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        Up    = glm::normalize(glm::cross(Right, Front));
-    }
 };
 
 #endif

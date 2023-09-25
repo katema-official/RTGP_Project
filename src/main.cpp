@@ -17,7 +17,5 @@ int main()
         std::cout << "Running tree visualizer..." << std::endl;
         MAIN2::main2();
     }
-    
-    
     return 0;
 }
