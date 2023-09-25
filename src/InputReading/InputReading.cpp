@@ -83,6 +83,8 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
         getline(infoFile, line);
         int levelInTree = stoi(line);
 
+
+
         getline(infoFile, line);
         std::vector<int> remainingQuantities;
         std::stringstream ss(line);
@@ -175,6 +177,11 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
         newTreeNode->setProjections(projections);
         newTreeNode->setFalseBoxes(falseBoxesPlaced);
         treeNodesVector.push_back(newTreeNode);
+
+        if(fatherID != -1)
+        {
+            treeNodesVector.at(fatherID)->addChildNodeExplorationID(explorationID);
+        }
 
 
         // Output the text from the file

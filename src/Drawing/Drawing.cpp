@@ -15,6 +15,7 @@
 #include <glm/glm.hpp>
 
 #include <settings.h>
+#include <camera.h>
 
 extern unsigned int SCR_WIDTH;
 extern unsigned int SCR_HEIGHT;
@@ -236,7 +237,7 @@ void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, flo
 
 
 
-void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
+void drawNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
                     int wC, int hC,
                     float wContainer, float hContainer, 
                     float wThickness, float hThickness, 
@@ -432,9 +433,38 @@ unsigned int* getBuffersWithDataToDrawRectangleNode()
 
 
 
-void drawNodeInTree()
+void drawNodeInTree(Shader& rectangleShader, Shader& textShader, unsigned int* buffersRectangle, Camera camera, glm::vec3 position)
 {
+    rectangleShader.use();
+    float aspect = ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
+    glm::mat4 projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.1f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
+    rectangleShader.setMat4("projection", projection);
+
+    // camera/view transformation
+    glm::mat4 view = camera.GetViewMatrix();
+    rectangleShader.setMat4("view", view);
+
+    glm::vec3 nodePosition(0.0f, 0.0f, -100.0f);
+    glm::mat4 modelNode = glm::mat4(1.0f);
+    modelNode = glm::translate(modelNode, nodePosition);
+    rectangleShader.setMat4("model", modelNode);
     
+    glBindVertexArray(buffersRectangle[0]);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+
+    textShader.use();
+    textShader.setMat4("projection", projection);
+    textShader.setMat4("view", view);
+
+    glm::vec3 textPosition = nodePosition;
+    textPosition.z += 1.0f;
+    glm::mat4 modelText = glm::mat4(1.0f);
+    modelText = glm::translate(modelText, textPosition);
+    textShader.setMat4("model", modelText);
+
+    RenderTextInSpace(textShader, "Pippo", 0.001, glm::vec4(0.0, 0.0, 0.0, 1.0));
 }
 
 

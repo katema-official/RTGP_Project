@@ -165,67 +165,16 @@ int main2()
 
         //drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
 
-        //drawTreeNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
+        //drawNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
         
 
         //############################################################
 
-        nodeInTreeShader.use();
-        float aspect = ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
-        glm::mat4 projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.1f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
-        nodeInTreeShader.setMat4("projection", projection);
-
-        // camera/view transformation
-        glm::mat4 view = camera.GetViewMatrix();
-        nodeInTreeShader.setMat4("view", view);
-
-        glm::vec3 nodePosition(0.0f, 0.0f, -100.0f);
-        glm::mat4 modelNode = glm::mat4(1.0f);
-        modelNode = glm::translate(modelNode, nodePosition);
-        nodeInTreeShader.setMat4("model", modelNode);
-        
-        glBindVertexArray(buffersForNodeInTree[0]);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
-
-        textShaderInSpace.use();
-        textShaderInSpace.setMat4("projection", projection);
-        textShaderInSpace.setMat4("view", view);
-
-        glm::vec3 textPosition = nodePosition;
-        textPosition.z += 1.0f;
-        glm::mat4 modelText = glm::mat4(1.0f);
-        modelText = glm::translate(modelText, textPosition);
-        textShaderInSpace.setMat4("model", modelText);
-
-        RenderTextInSpace(textShaderInSpace, "Pippo", 0.001, glm::vec4(0.0, 0.0, 0.0, 1.0));
+        drawNodeInTree(nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, glm::vec3(0.0, 0.0, -100.0));
 
 
-
-        nodeInTreeShader.use();
-
-        glm::vec3 nodePosition2(3.0f, 0.0f, -100.0f);
-        glm::mat4 modelNode2 = glm::mat4(1.0f);
-        modelNode2 = glm::translate(modelNode2, nodePosition2);
-        nodeInTreeShader.setMat4("model", modelNode2);
-        
-        glBindVertexArray(buffersForNodeInTree[0]);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-
-
-
-
-        textShaderInSpace.use();
-
-        textPosition = nodePosition2;
-        textPosition.z += 1.0f;
-        modelText = glm::mat4(1.0f);
-        modelText = glm::translate(modelText, textPosition);
-        textShaderInSpace.setMat4("model", modelText);
-
-        RenderTextInSpace(textShaderInSpace, "Pippo", 0.001, glm::vec4(0.0, 0.0, 0.0, 1.0));
         
 
         //############################################################

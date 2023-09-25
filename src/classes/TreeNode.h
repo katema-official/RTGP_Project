@@ -20,6 +20,7 @@ class TreeNode
         Box** falseBoxes;
         int nFalseBoxes;
         std::vector<int> remainingQuantities;
+        std::vector<int> childNodesExplorationID;
 
         TreeNode(int _explorationID, int _fatherID, int _creationID, int _PB, int _DB, int bestPB, int _level, std::vector<int> remainingQuantities);
 
@@ -32,6 +33,8 @@ class TreeNode
         void setFalseBoxes(std::vector<Box*> _boxesVector);
 
         void printTreeNode();
+
+        void addChildNodeExplorationID(int eID);
 };
 
 

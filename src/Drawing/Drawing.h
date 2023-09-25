@@ -5,6 +5,7 @@
 #include "../classes/TreeNode.h"
 
 #include <glm/glm.hpp>
+#include <camera.h>
 
 //to get the dimension of the container such that it will respect the aspect ratio of the application
 glm::vec2 getContainerEffectiveDimensions(int wContainer, int hContainer, float maxPortionDedicatedToContainer);
@@ -27,7 +28,7 @@ unsigned int* getBuffersToDrawBoxShape();
 void drawBoxShape(Shader& shader, unsigned int* buffers, float x0, float y0, float x1, float y1, glm::vec4 color);
 
 //to draw a node of the tree
-void drawTreeNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
+void drawNode_v1(TreeNode* treeNode, unsigned int* boxBuffers,
                     int wC, int hC,
                     float wContainer, float hContainer, 
                     float wThickness, float hThickness, 
@@ -47,6 +48,8 @@ void drawSpeed(Shader& shader, int speed, bool updated, float _initialTimeNewSpe
 //to draw a square, that will represent a node in the tree representation
 unsigned int* getBuffersWithDataToDrawRectangleNode();
 
+//to draw a node in the tree as a rectangle in a 3D space with a text on it
+void drawNodeInTree(Shader& rectangleShader, Shader& textShader, unsigned int* buffersRectangle, Camera camera, glm::vec3 position);
 
 
 

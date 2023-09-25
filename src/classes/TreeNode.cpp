@@ -18,6 +18,7 @@ TreeNode::TreeNode(int _explorationID, int _fatherID, int _creationID, int _PB, 
     nProjections = 0;
     falseBoxes = nullptr;
     nFalseBoxes = 0;
+    //childNodesExplorationID = std::vector<int>();
 
     remainingQuantities = _remainingQuantities;
 }
@@ -96,5 +97,16 @@ void TreeNode::printTreeNode()
     {
         falseBoxes[i]->printBoxInfo();
     }
+
+    std::cout << "Children Exploration IDs:" << std::endl;
+    for(int eID : childNodesExplorationID)
+    {
+        std::cout << eID << ", ";
+    } 
+    std::cout << std::endl;
 }
 
+void TreeNode::addChildNodeExplorationID(int eID)
+{
+    childNodesExplorationID.push_back(eID);
+}
