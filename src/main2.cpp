@@ -144,6 +144,9 @@ int main2()
     hContainerTrue = dimsTrue.y;
 
 
+    std::vector<int> modelIndices;
+    unsigned int VAO_Nodes = getVAOWithDataToDrawNodesInTree(modelIndices, treeNodesVector);
+
     //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
     //nodeInTreeShader.setMat4("projection", projection);
 
@@ -179,18 +182,19 @@ int main2()
         glm::mat4 view = camera.GetViewMatrix();
         
 
-        nodeInTreeShader.use();
+        /*nodeInTreeShader.use();
         nodeInTreeShader.setMat4("projection", projection);
         nodeInTreeShader.setMat4("view", view);
 
         textShaderInSpace.use();
         textShaderInSpace.setMat4("projection", projection);
-        textShaderInSpace.setMat4("view", view);
+        textShaderInSpace.setMat4("view", view);*/
 
-        drawWholeTree(treeNodesVector.at(0), treeNodesVector, nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, view, projection);
+        //drawWholeTree(treeNodesVector.at(0), treeNodesVector, nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, view, projection);
+
+        drawAllNodesInTree(treeNodesVector, modelIndices, nodeInTreeShader, VAO_Nodes, camera, view, projection);
 
 
-        
 
 
         

@@ -56,6 +56,20 @@ void drawWholeTree(TreeNode* node, std::vector<TreeNode*> nodesVector, Shader& n
 
 
 
+
+
+
+
+unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std::vector<TreeNode*> nodesVector);
+
+void drawAllNodesInTree(std::vector<TreeNode*> originalNodesVector, std::vector<int> recursiveNodesVector, Shader& nodeInTreeShader, unsigned int VAO, Camera camera, glm::mat4 view, glm::mat4 projection);
+
+
+
+
+
+
+
 unsigned int* getVAOs();
 
 std::tuple<unsigned int, int> swapRectangles(int i, float vertices[], unsigned int indices[]);

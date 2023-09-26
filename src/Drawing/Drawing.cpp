@@ -593,6 +593,177 @@ void drawWholeTree(TreeNode* node, std::vector<TreeNode*> nodesVector, Shader& n
 
 
 
+//actually we also add the colors
+void addModelMatrix_Nodes(std::vector<glm::mat4>& modelVector, std::vector<glm::vec4>& colorVector, std::vector<int>& indicesVector, TreeNode* node, std::vector<TreeNode*> nodesVector)
+{
+    indicesVector.push_back(node->explorationID);
+
+    if(node->explorationID == 0)
+    {
+        coordinatesNewNodeToDraw = glm::vec3(0.0, 0.0, -100.0);
+    }
+
+    //the model matrix of a node just needs to be translated
+    glm::vec3 posNode(coordinatesNewNodeToDraw.x, -1.0 * node->level * verticalSpaceBetweenLevels, coordinatesNewNodeToDraw.z);
+    glm::mat4 modelNode = glm::mat4(1.0f);
+    modelNode = glm::translate(modelNode, posNode);
+
+    modelVector.push_back(modelNode);
+
+    if(node->explorationID == globalOptimumID)
+    {
+        colorVector.push_back(colorOptimumNode);
+    }
+    else
+    {
+        colorVector.push_back(colorNormalNode);
+    }
+
+    //if this node has at least one child
+    if((node->childNodesExplorationID).size() > 0)
+    {
+        int currentChildLocalIndex = 0;
+
+        //for each child of this node
+        for(int i : node->childNodesExplorationID)
+        {
+            TreeNode* child = nodesVector.at(i);
+            if(currentChildLocalIndex > 0)
+            {
+                coordinatesNewNodeToDraw.x += horizontalSpaceBetweenNodes;
+            }
+
+            //recursive call
+            addModelMatrix_Nodes(modelVector, colorVector, indicesVector, child, nodesVector);
+
+            currentChildLocalIndex++;
+        }
+    }
+}
+
+void addModelMatrix_Bridges(TreeNode* node, std::vector<TreeNode*> nodesVector, Camera camera)
+{
+
+}
+
+
+//let's generate the transformation matrices
+unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std::vector<TreeNode*> nodesVector)
+{
+    //first, we get the model matrices
+    std::vector<glm::mat4> modelMatrices;
+    std::vector<glm::vec4> colors;
+
+    addModelMatrix_Nodes(modelMatrices, colors, modelIndices, nodesVector.at(0), nodesVector);
+
+    int nNodes = nodesVector.size();
+    glm::mat4* modelMatricesArray = new glm::mat4[nNodes];
+    copy(modelMatrices.begin(), modelMatrices.end(), modelMatricesArray);
+
+    glm::vec4* colorsArray = new glm::vec4[nNodes];
+    copy(colors.begin(), colors.end(), colorsArray);
+
+
+    unsigned int modelVBO;
+    glGenBuffers(1, &modelVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
+    glBufferData(GL_ARRAY_BUFFER, nodesVector.size() * sizeof(glm::mat4), &modelMatricesArray[0], GL_STATIC_DRAW);
+
+    unsigned int colorVBO;
+    glGenBuffers(1, &colorVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
+    glBufferData(GL_ARRAY_BUFFER, nodesVector.size() * sizeof(glm::vec4), &colorsArray[0], GL_STATIC_DRAW);
+
+
+
+    unsigned int* buffers = new unsigned int[3]; //there will be the VAO, the VBO and the EBO
+
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 2,                //this works fine under the assumption that in the VBO the vertices
+        1, 2, 3                 //are ordered like this: bottom-left, bottom-right, top-left, top-right
+    };
+
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        -0.5f, 0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f
+    };
+
+    glGenVertexArrays(1, &buffers[0]);
+    glGenBuffers(1, &buffers[1]);
+    glGenBuffers(1, &buffers[2]);
+    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glBindVertexArray(buffers[0]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[2]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    
+
+    glBindBuffer(GL_ARRAY_BUFFER, colorVBO);     //this attribute comes from a different vertex buffer
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0);
+
+    glVertexAttribDivisor(1, 1);    //tell OpenGL this is an instanced vertex attribute.
+
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, modelVBO);     //this attribute comes from a different vertex buffer
+
+    // set attribute pointers for matrix (4 times vec4)
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+    glVertexAttribDivisor(2, 1);    //tell OpenGL this is an instanced vertex attribute.
+    glVertexAttribDivisor(3, 1);
+    glVertexAttribDivisor(4, 1);
+    glVertexAttribDivisor(5, 1);
+
+    glBindVertexArray(0);
+
+
+    unsigned int VAO = buffers[0];
+    return VAO;
+
+
+}
+
+
+
+
+void drawAllNodesInTree(std::vector<TreeNode*> originalNodesVector, std::vector<int> recursiveNodesVector, Shader& nodeInTreeShader, unsigned int VAO, Camera camera, glm::mat4 view, glm::mat4 projection)
+{
+    int amount = recursiveNodesVector.size();
+
+    nodeInTreeShader.use();
+    nodeInTreeShader.setMat4("projection", projection);
+    nodeInTreeShader.setMat4("view", view);
+
+    glBindVertexArray(VAO);
+
+    //for(int i = 0; i < recursiveNodesVector.size(); i++)
+    //{
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, amount);
+    //}
+
+
+
+}
 
 
 
