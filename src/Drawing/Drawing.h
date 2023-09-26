@@ -41,7 +41,7 @@ void drawSpeed(Shader& shader, int speed, bool updated, float _initialTimeNewSpe
 
 
 
-
+//###############################################################################################################
 
 
 //to get the VAO, VBO and EBO (where the VBO is already filled with the four vertices)
@@ -49,8 +49,10 @@ void drawSpeed(Shader& shader, int speed, bool updated, float _initialTimeNewSpe
 unsigned int* getBuffersWithDataToDrawRectangleNode();
 
 //to draw a node in the tree as a rectangle in a 3D space with a text on it
-void drawNodeInTree(Shader& rectangleShader, Shader& textShader, unsigned int* buffersRectangle, Camera camera, glm::vec3 position);
+void drawNodeInTree(Shader& rectangleShader, Shader& textShader, unsigned int* buffersRectangle, Camera camera, glm::vec3 position, glm::mat4 viewMatrix, glm::mat4 projectionMatrix, TreeNode* node);
 
+//to draw the entire tree of the problem
+void drawWholeTree(TreeNode* node, std::vector<TreeNode*> nodesVector, Shader& nodeInTreeShader, Shader& textShaderInSpace, unsigned int* buffersForNodeInTree, Camera camera, glm::mat4 view, glm::mat4 projection);
 
 
 

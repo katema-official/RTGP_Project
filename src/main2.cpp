@@ -29,6 +29,8 @@
 extern unsigned int SCR_WIDTH;
 extern unsigned int SCR_HEIGHT;
 
+extern int globalOptimumID;
+
 namespace MAIN2
 {
 
@@ -124,6 +126,8 @@ int main2()
     for(TreeNode* t : treeNodesVector) t->printTreeNode();*/
 
     
+    std::cout << "Global Optimum ID = " << globalOptimumID << std::endl;
+    
     //unsigned int* buffersForBox = getBuffersToDrawBoxShape();
     unsigned int* buffersForNodeInTree = getBuffersWithDataToDrawRectangleNode();
 
@@ -169,10 +173,24 @@ int main2()
         
 
         //############################################################
+        float aspect = ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
+        glm::mat4 projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.1f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
+        // camera/view transformation
+        glm::mat4 view = camera.GetViewMatrix();
+        
+
+        nodeInTreeShader.use();
+        nodeInTreeShader.setMat4("projection", projection);
+        nodeInTreeShader.setMat4("view", view);
+
+        textShaderInSpace.use();
+        textShaderInSpace.setMat4("projection", projection);
+        textShaderInSpace.setMat4("view", view);
+
+        drawWholeTree(treeNodesVector.at(0), treeNodesVector, nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, view, projection);
 
 
-
-        drawNodeInTree(nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, glm::vec3(0.0, 0.0, -100.0));
+        
 
 
         

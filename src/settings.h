@@ -2,6 +2,13 @@
 
 #include <map>
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 inline int fontSize = 192;
 inline unsigned int VAO_Text;
 inline unsigned int VBO_Text;
@@ -9,6 +16,10 @@ inline unsigned int SCR_WIDTH = 1280;
 inline unsigned int SCR_HEIGHT = 720;
 
 inline float scalingQuantitiesText = 0.15;
+
+
+
+inline int globalOptimumID = -1;
 
 /// Holds all state information relevant to a character as loaded using FreeType
 struct Character {

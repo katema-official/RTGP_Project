@@ -8,6 +8,9 @@
 #include "../classes/Box.h"
 #include "../classes/TreeNode.h"
 #include "../classes/Projection.h"
+#include "../settings.h"
+
+extern int globalOptimumID;
 
 
 int readNodesNumber()
@@ -23,6 +26,8 @@ int readNodesNumber()
 
 void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& obstaclesVector, std::vector<TreeNode*>& treeNodesVector)
 {
+    int maxPB = -10;
+
     std::string line;
     std::ifstream infoFile("./InputReading/Files/nodesInformations.txt");
 
@@ -183,9 +188,11 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
             treeNodesVector.at(fatherID)->addChildNodeExplorationID(explorationID);
         }
 
-
-        // Output the text from the file
-        //std::cout << line << std::endl;
+        if(newTreeNode->PB > maxPB)
+        {
+            maxPB = newTreeNode->PB;
+            globalOptimumID = newTreeNode->explorationID;
+        }
     }
 
     infoFile.close();

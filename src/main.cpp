@@ -3,7 +3,7 @@
 #include <main1.h>
 #include <main2.h>
 
-int MAIN_CHOSEN = 1;
+int MAIN_CHOSEN = 2;
 
 int main()
 {

@@ -197,10 +197,8 @@ void RenderText(Shader& shader, std::string text, float x, float y, float scale,
 
 // render line of text in space
 // ----------------------------
-void RenderTextInSpace(Shader& shader, std::string text, float scale, glm::vec4 color)
+void RenderTextInSpace(Shader& shader, std::string text, float x, float y, float scale, glm::vec4 color)
 {
-    float x = -0.5f;
-    float y = 0.0f;
 	// OpenGL state (for rendering text)
 	// ------------
 	glEnable(GL_CULL_FACE);
