@@ -62,7 +62,12 @@ void drawWholeTree(TreeNode* node, std::vector<TreeNode*> nodesVector, Shader& n
 
 unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std::vector<TreeNode*> nodesVector);
 
+unsigned int getVAOWithDataToDrawBridgesInTree(int& count, std::vector<TreeNode*> nodesVector);
+
 void drawAllNodesInTree(std::vector<TreeNode*> originalNodesVector, std::vector<int> recursiveNodesVector, Shader& nodeInTreeShader, unsigned int VAO, Camera camera, glm::mat4 view, glm::mat4 projection);
+
+void drawAllBridgesInTree(std::vector<TreeNode*> originalNodesVector, int count, Shader& nodeInTreeShader, unsigned int VAO_Nodes, Camera camera, glm::mat4 view, glm::mat4 projection);
+
 
 
 

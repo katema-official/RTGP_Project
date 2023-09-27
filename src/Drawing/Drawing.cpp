@@ -641,9 +641,78 @@ void addModelMatrix_Nodes(std::vector<glm::mat4>& modelVector, std::vector<glm::
     }
 }
 
-void addModelMatrix_Bridges(TreeNode* node, std::vector<TreeNode*> nodesVector, Camera camera)
+//actually we also add the colors
+void addModelMatrix_Bridges(std::vector<glm::mat4>& modelVector, std::vector<glm::vec4>& colorVector, TreeNode* node, std::vector<TreeNode*> nodesVector, int& count)
 {
+    if(node->explorationID == 0)
+    {
+        coordinatesNewNodeToDraw = glm::vec3(0.0, 0.0, -100.0);
+    }
 
+    glm::vec3 posNode(coordinatesNewNodeToDraw.x, -1.0 * node->level * verticalSpaceBetweenLevels, coordinatesNewNodeToDraw.z);
+
+    //if this node has at least one child
+    if((node->childNodesExplorationID).size() > 0)
+    {
+        int currentChildLocalIndex = 0;
+        float xLastChild = posNode.x;
+
+        //for each child of this node
+        for(int i : node->childNodesExplorationID)
+        {
+            TreeNode* child = nodesVector.at(i);
+            if(currentChildLocalIndex > 0)
+            {
+                coordinatesNewNodeToDraw.x += horizontalSpaceBetweenNodes;
+            }
+
+            glm::vec3 posChild(coordinatesNewNodeToDraw.x, -1.0 * (node->level + 1) * verticalSpaceBetweenLevels, posNode.z);
+
+            //recursive call
+            addModelMatrix_Bridges(modelVector, colorVector, child, nodesVector, count);
+
+            //now draw the vertical bridge between the current node and the child node
+            if(currentChildLocalIndex == 0)
+            {
+    
+                glm::vec3 verticalBridgePos = glm::vec3(posNode.x, posChild.y + (verticalSpaceBetweenLevels / 2.0f), posNode.z - 10.0f);
+                glm::mat4 modelVBridge = glm::mat4(1.0f);
+                modelVBridge = glm::translate(modelVBridge, verticalBridgePos);
+                modelVBridge = glm::scale(modelVBridge, glm::vec3(0.25, verticalSpaceBetweenLevels, 1.0f));
+
+                modelVector.push_back(modelVBridge);
+                colorVector.push_back(colorNormalNode);
+                count++;
+            }
+            else
+            {
+                //for the others, half a bridge
+                glm::vec3 halfVerticalBridgePos = glm::vec3(posChild.x, posChild.y + (verticalSpaceBetweenLevels / 4.0f), posNode.z - 10.0f);
+                glm::mat4 modelHalfVBridge = glm::mat4(1.0f);
+                modelHalfVBridge = glm::translate(modelHalfVBridge, halfVerticalBridgePos);
+                modelHalfVBridge = glm::scale(modelHalfVBridge, glm::vec3(0.25, verticalSpaceBetweenLevels / 2.0f, 1.0f));
+
+                modelVector.push_back(modelHalfVBridge);
+                colorVector.push_back(colorNormalNode);
+                count++;
+            }
+            xLastChild = posChild.x;
+
+            currentChildLocalIndex++;
+        }
+
+        //now that all the child have been drawn, we can create the horizontal bridge
+        glm::vec3 posLastChild(xLastChild, -1.0 * (node->level + 1) * verticalSpaceBetweenLevels, posNode.z);
+
+        glm::vec3 horizontalBridgePos = glm::vec3(glm::mix(posNode.x, posLastChild.x, 0.5f), posNode.y - (verticalSpaceBetweenLevels) / 2.0f, posNode.z - 10.0f);
+        glm::mat4 modelHBridge = glm::mat4(1.0f);
+        modelHBridge = glm::translate(modelHBridge, horizontalBridgePos);
+        modelHBridge = glm::scale(modelHBridge, glm::vec3(posLastChild.x - posNode.x, 0.25, 1.0f));
+
+        modelVector.push_back(modelHBridge);
+        colorVector.push_back(colorNormalNode);
+        count++;
+    }
 }
 
 
@@ -667,12 +736,12 @@ unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std
     unsigned int modelVBO;
     glGenBuffers(1, &modelVBO);
     glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
-    glBufferData(GL_ARRAY_BUFFER, nodesVector.size() * sizeof(glm::mat4), &modelMatricesArray[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, nNodes * sizeof(glm::mat4), &modelMatricesArray[0], GL_STATIC_DRAW);
 
     unsigned int colorVBO;
     glGenBuffers(1, &colorVBO);
     glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-    glBufferData(GL_ARRAY_BUFFER, nodesVector.size() * sizeof(glm::vec4), &colorsArray[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, nNodes * sizeof(glm::vec4), &colorsArray[0], GL_STATIC_DRAW);
 
 
 
@@ -739,14 +808,106 @@ unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std
 
     unsigned int VAO = buffers[0];
     return VAO;
+}
+
+//let's generate the transformation matrices
+unsigned int getVAOWithDataToDrawBridgesInTree(int& count, std::vector<TreeNode*> nodesVector)
+{
+    //first, we get the model matrices
+    std::vector<glm::mat4> modelMatrices;
+    std::vector<glm::vec4> colors;
+
+    addModelMatrix_Bridges(modelMatrices, colors, nodesVector.at(0), nodesVector, count);
+
+    int nBridges = count;
+    glm::mat4* modelMatricesArray = new glm::mat4[nBridges];
+    copy(modelMatrices.begin(), modelMatrices.end(), modelMatricesArray);
+
+    glm::vec4* colorsArray = new glm::vec4[nBridges];
+    copy(colors.begin(), colors.end(), colorsArray);
 
 
+    unsigned int modelVBO;
+    glGenBuffers(1, &modelVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
+    glBufferData(GL_ARRAY_BUFFER, nBridges * sizeof(glm::mat4), &modelMatricesArray[0], GL_STATIC_DRAW);
+
+    unsigned int colorVBO;
+    glGenBuffers(1, &colorVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
+    glBufferData(GL_ARRAY_BUFFER, nBridges * sizeof(glm::vec4), &colorsArray[0], GL_STATIC_DRAW);
+
+
+
+    unsigned int* buffers = new unsigned int[3]; //there will be the VAO, the VBO and the EBO
+
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 2,                //this works fine under the assumption that in the VBO the vertices
+        1, 2, 3                 //are ordered like this: bottom-left, bottom-right, top-left, top-right
+    };
+
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        -0.5f, 0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f
+    };
+
+    glGenVertexArrays(1, &buffers[0]);
+    glGenBuffers(1, &buffers[1]);
+    glGenBuffers(1, &buffers[2]);
+    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glBindVertexArray(buffers[0]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[2]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    
+
+    glBindBuffer(GL_ARRAY_BUFFER, colorVBO);     //this attribute comes from a different vertex buffer
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0);
+
+    glVertexAttribDivisor(1, 1);    //tell OpenGL this is an instanced vertex attribute.
+
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, modelVBO);     //this attribute comes from a different vertex buffer
+
+    // set attribute pointers for matrix (4 times vec4)
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+    glVertexAttribDivisor(2, 1);    //tell OpenGL this is an instanced vertex attribute.
+    glVertexAttribDivisor(3, 1);
+    glVertexAttribDivisor(4, 1);
+    glVertexAttribDivisor(5, 1);
+
+    glBindVertexArray(0);
+
+
+    unsigned int VAO = buffers[0];
+    return VAO;
 }
 
 
 
 
-void drawAllNodesInTree(std::vector<TreeNode*> originalNodesVector, std::vector<int> recursiveNodesVector, Shader& nodeInTreeShader, unsigned int VAO, Camera camera, glm::mat4 view, glm::mat4 projection)
+void drawAllNodesInTree(std::vector<TreeNode*> originalNodesVector, std::vector<int> recursiveNodesVector, Shader& nodeInTreeShader, unsigned int VAO_Nodes, Camera camera, glm::mat4 view, glm::mat4 projection)
 {
     int amount = recursiveNodesVector.size();
 
@@ -754,18 +915,23 @@ void drawAllNodesInTree(std::vector<TreeNode*> originalNodesVector, std::vector<
     nodeInTreeShader.setMat4("projection", projection);
     nodeInTreeShader.setMat4("view", view);
 
-    glBindVertexArray(VAO);
+    glBindVertexArray(VAO_Nodes);
 
-    //for(int i = 0; i < recursiveNodesVector.size(); i++)
-    //{
-        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, amount);
-    //}
-
-
-
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, amount);
 }
 
+void drawAllBridgesInTree(std::vector<TreeNode*> originalNodesVector, int count, Shader& nodeInTreeShader, unsigned int VAO_Bridges, Camera camera, glm::mat4 view, glm::mat4 projection)
+{
+    int amount = count;
 
+    nodeInTreeShader.use();
+    nodeInTreeShader.setMat4("projection", projection);
+    nodeInTreeShader.setMat4("view", view);
+
+    glBindVertexArray(VAO_Bridges);
+
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, amount);
+}
 
 
 

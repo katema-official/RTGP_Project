@@ -147,8 +147,9 @@ int main2()
     std::vector<int> modelIndices;
     unsigned int VAO_Nodes = getVAOWithDataToDrawNodesInTree(modelIndices, treeNodesVector);
 
-    //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
-    //nodeInTreeShader.setMat4("projection", projection);
+    int bridgesCount = 0;
+    unsigned int VAO_Bridges = getVAOWithDataToDrawBridgesInTree(bridgesCount, treeNodesVector);
+    
 
     glEnable(GL_DEPTH_TEST);
     // render loop
@@ -193,6 +194,7 @@ int main2()
         //drawWholeTree(treeNodesVector.at(0), treeNodesVector, nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, view, projection);
 
         drawAllNodesInTree(treeNodesVector, modelIndices, nodeInTreeShader, VAO_Nodes, camera, view, projection);
+        drawAllBridgesInTree(treeNodesVector, bridgesCount, nodeInTreeShader, VAO_Bridges, camera, view, projection);
 
 
 
