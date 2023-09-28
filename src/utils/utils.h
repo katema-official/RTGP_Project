@@ -26,3 +26,8 @@ float* HSVtoRGB(float h, float s, float v);
 //function that generates an unique color from an integer ID
 glm::vec4 getColorFromID(int ID);
 
+
+
+//###########################################################################################
+
+bool generateBitmapFont(const std::string& fontFilename, const int fontSize, const std::string& bitmapFilename, const std::string& widthsFilename);

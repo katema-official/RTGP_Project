@@ -435,20 +435,10 @@ unsigned int* getBuffersWithDataToDrawRectangleNode()
 
 
 
-void drawNodeInTree(Shader& rectangleShader, Shader& textShader, unsigned int* buffersRectangle, Camera camera, glm::vec3 position, glm::mat4 viewMatrix, glm::mat4 projectionMatrix, TreeNode* node)
+void drawNodeTextInTree(Shader& textShader, unsigned int* buffersRectangle, Camera camera, glm::vec3 position, glm::mat4 viewMatrix, glm::mat4 projectionMatrix, TreeNode* node)
 {
-    rectangleShader.use();
-    
     glm::vec3 nodePosition = position;
-    glm::mat4 modelNode = glm::mat4(1.0f);
-    modelNode = glm::translate(modelNode, nodePosition);
-    rectangleShader.setMat4("model", modelNode);
     
-    glBindVertexArray(buffersRectangle[0]);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-
-
     textShader.use();
 
     glm::vec3 textPosition = nodePosition;
@@ -459,6 +449,7 @@ void drawNodeInTree(Shader& rectangleShader, Shader& textShader, unsigned int* b
 
     RenderTextInSpace(textShader, "Exploration ID:", -0.45, 0.1, 0.0005, glm::vec4(0.0, 0.0, 0.0, 1.0));
     RenderTextInSpace(textShader, std::to_string(node->explorationID), -0.45, -0.1, 0.001, glm::vec4(0.0, 0.0, 0.0, 1.0));
+    //std::cout << "CIAOOOOO" << std::endl;
 }
 
 
@@ -474,38 +465,24 @@ glm::vec4 colorOptimumNode(0.0, 1.0, 0.0, 1.0);
 //-all the nodes of the same level in the tree will have the same y coordinate
 //-whenever a node has one or more child, we build them going to the level below, and moving to the right if we need to
 
-void drawWholeTree(TreeNode* node, std::vector<TreeNode*> nodesVector, Shader& nodeInTreeShader, Shader& textShaderInSpace, unsigned int* buffersForNodeInTree, Camera camera, glm::mat4 view, glm::mat4 projection)
+void drawWholeTreeText(TreeNode* node, std::vector<TreeNode*> nodesVector, Shader& textShaderInSpace, unsigned int* buffersForNodeInTree, Camera camera, glm::mat4 view, glm::mat4 projection)
 {
     if(node->explorationID == 0)
     {
         //otherwise at each frame the nodes would be rendered more and more to the right
         coordinatesNewNodeToDraw = glm::vec3(0.0, 0.0, -100.0);
-        nodeInTreeShader.use();
-        nodeInTreeShader.setVec4("color", colorNormalNode);   //to call this just one time
     }
 
-    
-    if(node->explorationID == globalOptimumID)
-    {
-        nodeInTreeShader.use();
-        nodeInTreeShader.setVec4("color", colorOptimumNode);
-    }
-
-    //draw the current node. The x and y coordinates are given by the global variable "coordinatesNewNodeToDraw", while the y is given by the level of the node in the tree
+    //draw the current node text. The x and y coordinates are given by the global variable "coordinatesNewNodeToDraw", while the y is given by the level of the node in the tree
     glm::vec3 posNode(coordinatesNewNodeToDraw.x, -1.0 * node->level * verticalSpaceBetweenLevels, coordinatesNewNodeToDraw.z);
-    drawNodeInTree(nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, posNode, view, projection, node);
+    drawNodeTextInTree(textShaderInSpace, buffersForNodeInTree, camera, posNode, view, projection, node);
 
-    if(node->explorationID == globalOptimumID)  //to return to the original color once the optimum has been colored differently
-    {   
-        nodeInTreeShader.use();
-        nodeInTreeShader.setVec4("color", colorNormalNode);
-    }
+    return;
 
     //if this node has at least one child
     if((node->childNodesExplorationID).size() > 0)
     {
         int currentChildLocalIndex = 0;
-        float xLastChild = posNode.x;
 
         //for each child of this node
         for(int i : node->childNodesExplorationID)
@@ -514,74 +491,14 @@ void drawWholeTree(TreeNode* node, std::vector<TreeNode*> nodesVector, Shader& n
             if(currentChildLocalIndex > 0)
             {
                 coordinatesNewNodeToDraw.x += horizontalSpaceBetweenNodes;
-                //posChild.x += horizontalSpaceBetweenNodes;
             }
-
-            glm::vec3 posChild(coordinatesNewNodeToDraw.x, -1.0 * (node->level + 1) * verticalSpaceBetweenLevels, posNode.z);
-            //if(node->explorationID == 0) std::cout << posChild.x << "," << posChild.y << "," << posChild.z << std::endl;
 
             //draw the child
-            drawWholeTree(child, nodesVector, nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, view, projection);
-
-            //now draw the vertical bridge between the current node and the child node
-            if(currentChildLocalIndex == 0)
-            {
-                //for the first child, a full bridge
-                nodeInTreeShader.use();
-    
-                glm::vec3 verticalBridgePos = glm::vec3(posNode.x, posChild.y + (verticalSpaceBetweenLevels / 2.0f), posNode.z - 10.0f);
-                glm::mat4 model = glm::mat4(1.0f);
-                
-                model = glm::translate(model, verticalBridgePos);
-                model = glm::scale(model, glm::vec3(0.25, verticalSpaceBetweenLevels, 1.0f));
-
-                nodeInTreeShader.setMat4("model", model);
-                //if(node->explorationID == 0) std::cout << verticalBridgePos.x << "," << verticalBridgePos.y << "," << verticalBridgePos.z << std::endl;
-                
-                glBindVertexArray(buffersForNodeInTree[0]);
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-            }
-            else
-            {
-                //for the others, half a bridge
-                nodeInTreeShader.use();
-
-                glm::vec3 halfVerticalBridgePos = glm::vec3(posChild.x, posChild.y + (verticalSpaceBetweenLevels / 4.0f), posNode.z - 10.0f);
-                glm::mat4 model = glm::mat4(1.0f);
-
-                model = glm::translate(model, halfVerticalBridgePos);
-                model = glm::scale(model, glm::vec3(0.25, verticalSpaceBetweenLevels / 2.0f, 1.0f));
-
-                nodeInTreeShader.setMat4("model", model);
-                //if(node->explorationID == 0) std::cout << halfVerticalBridgePos.x << "," << halfVerticalBridgePos.y << "," << halfVerticalBridgePos.z << std::endl;
-
-                glBindVertexArray(buffersForNodeInTree[0]);
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-            }
-            xLastChild = posChild.x;
+            drawWholeTreeText(child, nodesVector, textShaderInSpace, buffersForNodeInTree, camera, view, projection);
 
             currentChildLocalIndex++;
         }
-
-        //now that all the child have been drawn, we can create the horizontal bridge
-        glm::vec3 posLastChild(xLastChild, -1.0 * (node->level + 1) * verticalSpaceBetweenLevels, posNode.z);
-
-        nodeInTreeShader.use();
-
-        glm::vec3 horizontalBridgePos = glm::vec3(glm::mix(posNode.x, posLastChild.x, 0.5f), posNode.y - (verticalSpaceBetweenLevels) / 2.0f, posNode.z - 10.0f);
-        glm::mat4 model = glm::mat4(1.0f);
-
-        model = glm::translate(model, horizontalBridgePos);
-        model = glm::scale(model, glm::vec3(posLastChild.x - posNode.x, 0.25, 1.0f));
-
-        nodeInTreeShader.setMat4("model", model);
-
-        glBindVertexArray(buffersForNodeInTree[0]);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        
     }
-
-    
 
     //drawNodeInTree(nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, glm::vec3(0.0, 0.0, -100.0), view, projection, 0);
     //drawNodeInTree(nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, glm::vec3(10.0, 5.0, -100.0), view, projection, 1);

@@ -183,21 +183,19 @@ int main2()
         glm::mat4 view = camera.GetViewMatrix();
         
 
-        /*nodeInTreeShader.use();
-        nodeInTreeShader.setMat4("projection", projection);
-        nodeInTreeShader.setMat4("view", view);
 
-        textShaderInSpace.use();
-        textShaderInSpace.setMat4("projection", projection);
-        textShaderInSpace.setMat4("view", view);*/
+        
 
-        //drawWholeTree(treeNodesVector.at(0), treeNodesVector, nodeInTreeShader, textShaderInSpace, buffersForNodeInTree, camera, view, projection);
 
         drawAllNodesInTree(treeNodesVector, modelIndices, nodeInTreeShader, VAO_Nodes, camera, view, projection);
         drawAllBridgesInTree(treeNodesVector, bridgesCount, nodeInTreeShader, VAO_Bridges, camera, view, projection);
+        //drawAllNodesTextInTree(treeNodesVector, modelIndices, nodeInTreeShader, ???, camera, view, projection);
 
 
-
+        /*textShaderInSpace.use();
+        textShaderInSpace.setMat4("projection", projection);
+        textShaderInSpace.setMat4("view", view);
+        drawWholeTreeText(treeNodesVector.at(0), treeNodesVector, textShaderInSpace, buffersForNodeInTree, camera, view, projection);*/
 
         
 
