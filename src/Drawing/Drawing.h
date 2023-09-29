@@ -72,6 +72,9 @@ void drawAllBridgesInTree(std::vector<TreeNode*> originalNodesVector, int count,
 
 
 
+unsigned int getVAOProvaTesto();
+
+unsigned int loadAndReturnBitmapTexture(const std::string& bitmapName);
 
 
 

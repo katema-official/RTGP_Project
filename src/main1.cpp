@@ -95,10 +95,7 @@ int main1()
     Shader boxShader("shader_node_info.vs", "shader_node_info.fs"); // you can name your shader files however you like
 
 
-    //############################################################################
-    generateBitmapFont("../fonts/8bitoperator.ttf", 40, "bitmapfont8bitoperator.bmp", "bitmapfont_widths8bitoperator.txt");
-    //############################################################################
-
+    
 
     numberOfNodes = readNodesNumber();
     std::cout << "numberOfNodes = " << numberOfNodes << std::endl;

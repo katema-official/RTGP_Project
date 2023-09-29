@@ -149,7 +149,22 @@ int main2()
 
     int bridgesCount = 0;
     unsigned int VAO_Bridges = getVAOWithDataToDrawBridgesInTree(bridgesCount, treeNodesVector);
+
+
+    //############################################################################
+    std::string fontName = "Impact";
+    std::tuple<bool, unsigned int, int*> generatedTexture = generateBitmapFont("../fonts/" + fontName + ".ttf", 50, "bitmapfont" + fontName + ".bmp", "bitmapfont_widths" + fontName + ".txt");
     
+    unsigned int textTexture;
+    int* textWidths;
+    if(std::get<0>(generatedTexture)) textTexture = std::get<1>(generatedTexture);
+    if(std::get<0>(generatedTexture)) textWidths = std::get<2>(generatedTexture);
+    unsigned int VAO_provaTesto = getVAOProvaTesto();
+    Shader provaTestoShader("./shadersTextInstancing/shader_prova_testo.vs", "./shadersTextInstancing/shader_prova_testo.fs");
+    //unsigned int textTexture2 = loadAndReturnBitmapTexture();
+    
+    
+
 
     glEnable(GL_DEPTH_TEST);
     // render loop
@@ -183,13 +198,33 @@ int main2()
         glm::mat4 view = camera.GetViewMatrix();
         
 
+        drawAllNodesInTree(treeNodesVector, modelIndices, nodeInTreeShader, VAO_Nodes, camera, view, projection);
+        drawAllBridgesInTree(treeNodesVector, bridgesCount, nodeInTreeShader, VAO_Bridges, camera, view, projection);
+        //drawAllNodesTextInTree(treeNodesVector, modelIndices, nodeInTreeShader, ???, camera, view, projection);
+
+
+        //glEnable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textTexture);
+        provaTestoShader.use();
+        provaTestoShader.setMat4("projection", projection);
+        provaTestoShader.setMat4("view", view);
+        glm::mat4 model = glm::mat4(1.0f);
+        provaTestoShader.setMat4("model", model);
+        provaTestoShader.setVec4("textColor", glm::vec4(0.0, 0.0, 0.0, 1.0));
+        glBindVertexArray(VAO_provaTesto);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glDisable(GL_BLEND);
+        //glDisable(GL_CULL_FACE);
 
         
 
 
-        drawAllNodesInTree(treeNodesVector, modelIndices, nodeInTreeShader, VAO_Nodes, camera, view, projection);
-        drawAllBridgesInTree(treeNodesVector, bridgesCount, nodeInTreeShader, VAO_Bridges, camera, view, projection);
-        //drawAllNodesTextInTree(treeNodesVector, modelIndices, nodeInTreeShader, ???, camera, view, projection);
+        
 
 
         /*textShaderInSpace.use();

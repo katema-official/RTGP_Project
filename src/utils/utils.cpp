@@ -13,6 +13,7 @@
 #include <shader_s.h>
 #include <settings.h>
 #include <camera.h>
+#include "Drawing/Drawing.h"
 
 extern unsigned int SCR_WIDTH;
 extern unsigned int SCR_HEIGHT;
@@ -410,8 +411,23 @@ unsigned char* toBitmapBuffer( int* bufferSize , const int imageWidth , const in
 
 
 //adapted from https://levelup.gitconnected.com/how-to-create-a-bitmap-font-with-freetype-58e8c31878a9
-bool generateBitmapFont(const std::string& fontFilename, const int fontSize, const std::string& bitmapFilename, const std::string& widthsFilename)
+std::tuple<bool, unsigned int, int*> generateBitmapFont(const std::string& fontFilename, const int fontSize, const std::string& bitmapFilename, const std::string& widthsFilename)
 {
+
+    //first check if the bitmap file already exists.
+    std::string fullPath = "./bitmapFonts/" + bitmapFilename;
+    std::ifstream f(fullPath.c_str());
+    if(f.good())
+    {
+        std::cout << "Bitmap exists" << std::endl;
+    }
+    else
+    {
+        std::cout << "Bitmap does not exist" << std::endl;
+    }
+
+
+
     FT_Library lib;
     FT_Error error;
     FT_Face face;
@@ -422,7 +438,7 @@ bool generateBitmapFont(const std::string& fontFilename, const int fontSize, con
     if ( error != FT_Err_Ok )
     {
         std::cout << "BitmapFontGenerator > ERROR: FT_Init_FreeType failed, error code: " << error << std::endl;
-        return false;
+        return std::make_tuple(false, 0, nullptr);
     }
 
     // load font
@@ -430,12 +446,12 @@ bool generateBitmapFont(const std::string& fontFilename, const int fontSize, con
     if ( error == FT_Err_Unknown_File_Format )
     {
         std::cout << "BitmapFontGenerator > ERROR: failed to open file \"" << fontFilename << "\", unknown file format" << std::endl;
-        return false;
+        return std::make_tuple(false, 0, nullptr);
     }
     else if ( error )
     {
         std::cout << "BitmapFontGenerator > ERROR: failed to open file \"" << fontFilename << "\", error code: " << error << std::endl;
-        return false;
+        return std::make_tuple(false, 0, nullptr);
     }
 
     // set font size
@@ -531,36 +547,8 @@ bool generateBitmapFont(const std::string& fontFilename, const int fontSize, con
         }
     }
 
-    //#######################
-    /*
-    // generate texture
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_RED,
-        imageWidth,
-        imageHeight,
-        0,
-        GL_RED,
-        GL_UNSIGNED_BYTE,
-        buffer
-    );
-    // set texture options
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
-    */
-    //#########################
-
-
-    //OPTIONAL
-
+    //CREATE BITMAP AND WIDTH FILES
     // convert the buffer to the bitmap format
     int paddedSize = 0;
     unsigned char* bitmapBuffer = toBitmapBuffer( &paddedSize , imageWidth , imageHeight , buffer );
@@ -586,10 +574,11 @@ bool generateBitmapFont(const std::string& fontFilename, const int fontSize, con
     bmih.importantcolorsused = 0;
 
     FILE* file;
-    if ( ( file = fopen( bitmapFilename.c_str() , "wb" ) ) == NULL )
+    std::string bitmapFilenameFull = "./bitmapFonts/" + bitmapFilename;
+    if ( ( file = fopen( bitmapFilenameFull.c_str() , "wb" ) ) == NULL )
     {
         std::cout << "BitmapFontGenerator > failed to save bitmap file \"" << bitmapFilename << "\"" << std::endl;
-        return false;
+        return std::make_tuple(false, 0, nullptr);
     }
 
     // write file header
@@ -611,7 +600,8 @@ bool generateBitmapFont(const std::string& fontFilename, const int fontSize, con
 
     // save the widths file
     std::ofstream ofs;
-    ofs.open( widthsFilename );
+    std::string widthsFilenameFull = "./bitmapFonts/" + widthsFilename;
+    ofs.open( widthsFilenameFull );
     if ( ofs.is_open() )
     {
         for ( int i = 0 ; i < 128 ; ++i )
@@ -623,20 +613,67 @@ bool generateBitmapFont(const std::string& fontFilename, const int fontSize, con
     else
     {
         std::cout << "BitmapFontGenerator > failed to save widths file \"" << bitmapFilename << "\"" << std::endl;
-        return false;
+        return std::make_tuple(false, 0, nullptr);
     }
 
-    delete[] widths;
+    //delete[] widths;
 
-
+    
 
     // shutdown freetype
 	error = FT_Done_FreeType( lib );
 	if ( error != FT_Err_Ok )
 	{
 		std::cout << "BitmapFontGenerator > ERROR: FT_Done_FreeType failed, error code: " << error << std::endl;
-		return false;
+		return std::make_tuple(false, 0, nullptr);
 	}
-	return true;
+
+    unsigned int texture = loadAndReturnBitmapTexture(bitmapFilename);
+	
+    
+    return std::make_tuple(true, texture, widths);
+}
+
+
+
+
+float* getTextureCoordinatesOfCharacterInBitmap(char c)
+{
+    float id = c;
+    int id_int = c;
+    if(id_int < 0 || id_int > 127)
+    {
+        std::cout << "ERROR: getTextureCoordinatesOfCharacterInBitmap input not in correct range" << std::endl;
+    }
+    int rows = 8;
+    int columns = 16;
+    int rowIndex = id / columns;
+    int columnIndex = id_int % columns;
+    float xOffset = (1.0 / 16.0) / 1024.0;
+    float yOffset = (1.0 / 8.0) / 8.0;
+    float xToAdd = 1.0 / 16.0;
+    float yToAdd = 1.0 / 8.0;
+
+    float x0 = (float) columnIndex / (float) columns;
+
+    float y0 = ((float) (rows - 1 - rowIndex)) / (float) rows;      // + yOffset;
+
+    float x1 = x0 + xToAdd;
+
+    float y1 = y0 + yToAdd;     // - yOffset;
+
+    
+
+    //std::cout << "rowIndex = " << rowIndex << " columnIndex = " << columnIndex << " x0 = " << x0 << " y0 = " << y0 << " x1 = " << x1 << " y1 = " << y1 << std::endl;
+
+    float* textureCoordinates = new float[4];
+    textureCoordinates[0] = x0;
+    textureCoordinates[1] = y0;
+    textureCoordinates[2] = x1;
+    textureCoordinates[3] = y1; 
+
+    //std::cout << "ID = " << id << std::endl;
+    
+    return textureCoordinates;
 }
 

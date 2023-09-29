@@ -30,4 +30,12 @@ glm::vec4 getColorFromID(int ID);
 
 //###########################################################################################
 
-bool generateBitmapFont(const std::string& fontFilename, const int fontSize, const std::string& bitmapFilename, const std::string& widthsFilename);
+//to load a bitmap font in a 2D texture. Returns:
+//<false, ...> if there was an error in generating the texture
+//<true, id> if the texture, of id "id", was correctly created
+std::tuple<bool, unsigned int, int*> generateBitmapFont(const std::string& fontFilename, const int fontSize, const std::string& bitmapFilename, const std::string& widthsFilename);
+
+
+float* getTextureCoordinatesOfCharacterInBitmap(char c);
+
+
