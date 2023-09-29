@@ -165,7 +165,6 @@ int main2()
     
     
 
-
     glEnable(GL_DEPTH_TEST);
     // render loop
     // -----------
