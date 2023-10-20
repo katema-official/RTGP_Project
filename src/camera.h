@@ -22,7 +22,7 @@ enum Camera_Movement {
 const float SPEED       =  10.0f; //2.5f;
 const float SENSITIVITY =  0.1f;
 const float ZOOM        =  1.0f;
-const float ZOOM_SPEED  =  10.0f;
+const float ZOOM_SPEED  =  5.0f;
 
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL

@@ -525,6 +525,8 @@ std::tuple<bool, unsigned int, int*> generateBitmapFont(const std::string& fontF
 
         // save the character width
         widths[i] = face->glyph->metrics.width/64;
+        //[mine] here I cheat a bit because I want the empty space to have some width
+        if(i == 32) widths[i] = (face->max_advance_width/64) * (2.0 / 5.0);
 
         // find the tile position where we have to draw the character
         int x = (i%16)*(fontSize+2);
@@ -637,7 +639,7 @@ std::tuple<bool, unsigned int, int*> generateBitmapFont(const std::string& fontF
 
 
 
-float* getTextureCoordinatesOfCharacterInBitmap(char c)
+glm::vec2 getTextureCoordinatesOffsetOfCharacterInBitmap(char c)
 {
     float id = c;
     int id_int = c;
@@ -658,22 +660,14 @@ float* getTextureCoordinatesOfCharacterInBitmap(char c)
 
     float y0 = ((float) (rows - 1 - rowIndex)) / (float) rows;      // + yOffset;
 
+    return glm::vec2(x0, y0);
+
+
+    //the function now returns an offset, we don't need anymore the other 
+    //set of (upper-right) coordinates
     float x1 = x0 + xToAdd;
 
     float y1 = y0 + yToAdd;     // - yOffset;
 
-    
-
-    //std::cout << "rowIndex = " << rowIndex << " columnIndex = " << columnIndex << " x0 = " << x0 << " y0 = " << y0 << " x1 = " << x1 << " y1 = " << y1 << std::endl;
-
-    float* textureCoordinates = new float[4];
-    textureCoordinates[0] = x0;
-    textureCoordinates[1] = y0;
-    textureCoordinates[2] = x1;
-    textureCoordinates[3] = y1; 
-
-    //std::cout << "ID = " << id << std::endl;
-    
-    return textureCoordinates;
 }
 

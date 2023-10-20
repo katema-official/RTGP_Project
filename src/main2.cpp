@@ -160,11 +160,10 @@ int main2()
     int* textWidths;
     if(std::get<0>(generatedTexture)) textTexture = std::get<1>(generatedTexture);
     if(std::get<0>(generatedTexture)) textWidths = std::get<2>(generatedTexture);
-    unsigned int VAO_provaTesto = getVAONodesText(nodesIndices, nodesPositions, textWidths);
+    int lettersCount = 0;   //how many letters need to be drawn
+    unsigned int VAO_provaTesto = getVAONodesText(nodesIndices, nodesPositions, textWidths, lettersCount);
     Shader provaTestoShader("./shadersTextInstancing/shader_prova_testo.vs", "./shadersTextInstancing/shader_prova_testo.fs");
     
-    
-
     glEnable(GL_DEPTH_TEST);
     // render loop
     // -----------
@@ -211,11 +210,12 @@ int main2()
         provaTestoShader.use();
         provaTestoShader.setMat4("projection", projection);
         provaTestoShader.setMat4("view", view);
-        glm::mat4 model = glm::mat4(1.0f);
-        provaTestoShader.setMat4("model", model);
+        //glm::mat4 model = glm::mat4(1.0f);
+        //provaTestoShader.setMat4("model", model);
         provaTestoShader.setVec4("textColor", glm::vec4(0.0, 0.0, 0.0, 1.0));
         glBindVertexArray(VAO_provaTesto);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, lettersCount);
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glDisable(GL_BLEND);
         //glDisable(GL_CULL_FACE);

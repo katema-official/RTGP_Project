@@ -451,7 +451,6 @@ void drawNodeTextInTree(Shader& textShader, unsigned int* buffersRectangle, Came
 
     RenderTextInSpace(textShader, "Exploration ID:", -0.45, 0.1, 0.0005, glm::vec4(0.0, 0.0, 0.0, 1.0));
     RenderTextInSpace(textShader, std::to_string(node->explorationID), -0.45, -0.1, 0.001, glm::vec4(0.0, 0.0, 0.0, 1.0));
-    //std::cout << "CIAOOOOO" << std::endl;
 }
 
 
@@ -863,12 +862,51 @@ void drawAllBridgesInTree(std::vector<TreeNode*> originalNodesVector, int count,
 
 
 
-void addModelMatrixAndTextureCoordinates_Nodes(std::vector<int> indicesVector, std::vector<glm::vec3> nodesPotisions, int* textWidths, int nTextWidths)
+void addModelMatrixAndTextureCoordinates_Nodes(std::vector<std::string> stringsVector, std::vector<glm::vec3> nodesPositions, int* textWidths, int nTextWidths,
+    std::vector<glm::mat4>& modelMatrices, std::vector<glm::vec2>& textureOffsets, float scaleFactor, int& count)
 {
+    for(int index = 0; index < stringsVector.size(); index++)   //for each string that we want to draw
+    {
+        std::string word = stringsVector.at(index);
+
+        //we first convert the string to a char array, so to have access to each single character individually
+        int length = word.length();
+        char* lettersArray = new char[length + 1];
+        strcpy(lettersArray, word.c_str());
+
+        //now that we have access to each single letter, let's get its texture coordinate offset
+        for(int i = 0; i < length; i++)
+        {
+            glm::vec2 texOffset = getTextureCoordinatesOffsetOfCharacterInBitmap(lettersArray[i]);
+            textureOffsets.push_back(texOffset);
+            count++;
+        }
+
+        //and let's also get the right transformation matrix for each single letter
+        glm::vec3 nodeCenter = nodesPositions.at(index);
+        glm::vec3 currentPosition = nodeCenter + glm::vec3(0.0, 0.0, 10.0);
+        float yOffset_1 = 0.05f;
+        currentPosition.y -= yOffset_1;
+        float xOffset_1 = 0.40f;
+        currentPosition.x -= xOffset_1;
+        for(int i = 0; i < length; i++)
+        {
+            glm::mat4 modelLetter = glm::mat4(1.0f);
+            modelLetter = glm::translate(modelLetter, currentPosition);
+            modelLetter = glm::scale(modelLetter, glm::vec3(scaleFactor, scaleFactor, 1.0f));
+            modelMatrices.push_back(modelLetter);
+            
+            char letter = lettersArray[i];
+            int k = (int) letter;
+            float width = ((float) textWidths[k] / 48.0) * scaleFactor;
+            currentPosition.x += width;
+            currentPosition.z += 0.001f; //so that the next gliph goes "on top" of the prevoius one
+        }
+    }
 
 }
 
-unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::vec3> nodesPositions, int* textWidths)
+unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::vec3> nodesPositions, int* textWidths, int& lettersCount)
 {
     //we have to convert the explorationIDs of the indicesVector, that are ints, in strings
     std::vector<std::string> explorationIDsVector;
@@ -883,13 +921,30 @@ unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::ve
 
     //given all the texts we have to render and the position in space of their corresponding node,
     //we have to produce two vectors:
-    //-one with the positions           of each individual character of each text
-    //-one with the texture coordinates of each individual character of each text
+    //-one with the positions                   of each individual character of each text (actually, the transformation mat4 to apply to them)
+    //-one with the texture coordinate offset   of each individual character of each text
+    //This is because each position of these vectors will correspond to an instance that will 
+    //be drawn from the same quad, where each instance is differen from the others because of 
+    //its transform matrix and its texture offset (that determines the glyph drawn)
+    float scale = 0.2;
+    addModelMatrixAndTextureCoordinates_Nodes(explorationIDsVector, nodesPositions, textWidths, nTextWidths, modelVector, offsetCoordinatesVector, scale, lettersCount);
+    
+    int nLettersTotal = lettersCount;
+    glm::mat4* modelLettersArray = new glm::mat4[nLettersTotal];
+    copy(modelVector.begin(), modelVector.end(), modelLettersArray);
 
+    glm::vec2* offsetCoordinatesArray = new glm::vec2[nLettersTotal];
+    copy(offsetCoordinatesVector.begin(), offsetCoordinatesVector.end(), offsetCoordinatesArray);
 
+    unsigned int modelVBO;
+    glGenBuffers(1, &modelVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
+    glBufferData(GL_ARRAY_BUFFER, nLettersTotal * sizeof(glm::mat4), &modelLettersArray[0], GL_STATIC_DRAW);
 
-
-
+    unsigned int offsetTextureVBO;
+    glGenBuffers(1, &offsetTextureVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, offsetTextureVBO);
+    glBufferData(GL_ARRAY_BUFFER, nLettersTotal * sizeof(glm::vec2), &offsetCoordinatesArray[0], GL_STATIC_DRAW);
 
 
     unsigned int* buffers = new unsigned int[3]; //there will be the VAO, the VBO and the EBO
@@ -899,12 +954,17 @@ unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::ve
         1, 2, 3                 //are ordered like this: bottom-left, bottom-right, top-left, top-right
     };
 
-    float* textureCoordinates = getTextureCoordinatesOfCharacterInBitmap('p');
+    //glm::vec2 textureCoordinatesOffset = getTextureCoordinatesOffsetOfCharacterInBitmap('c');
 
-    float x0_texture = textureCoordinates[0];
-    float y0_texture = textureCoordinates[1];
-    float x1_texture = textureCoordinates[2];
-    float y1_texture = textureCoordinates[3];
+    //With these texture coordinates, one would draw only the bottom-left element of the bitmap.
+    //It will be the instance array of offsets to effectively determine the character drawn from
+    //the bitmap. Each offset is returned from getTextureCoordinatesOffsetOfCharacterInBitmap(character)
+    float x0_texture = 0.0;
+    float y0_texture = 0.0;
+    float x1_texture = 1.0/16.0;
+    float y1_texture = 1.0/8.0;
+
+
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, //  x0_texture, y0_texture,
         0.5f, -0.5f, 0.0f,  //  x1_texture, y0_texture,
@@ -917,7 +977,7 @@ unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::ve
         x0_texture, y1_texture,
         x1_texture, y1_texture
     };
-    delete[] textureCoordinates;
+    //delete[] textureCoordinates;
 
     glGenVertexArrays(1, &buffers[0]);
     glGenBuffers(1, &buffers[1]);
@@ -935,15 +995,53 @@ unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::ve
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-
-
     unsigned int textureVBO;
     glGenBuffers(1, &textureVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, textureVBO);  //this atribute comes from a different vertex buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(textureCoordinatesForVBO), textureCoordinatesForVBO, GL_STATIC_DRAW);
 
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
+
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, offsetTextureVBO);    
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
+
+    glVertexAttribDivisor(2, 1);    //instanced vertex attribute
+
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
+
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+    glVertexAttribDivisor(3, 1);    //instanced vertex attribute
+    glVertexAttribDivisor(4, 1);
+    glVertexAttribDivisor(5, 1);
+    glVertexAttribDivisor(6, 1);
+
+
+    /*
+    unsigned int offsetTextureVBO;
+    glGenBuffers(1, &offsetTextureVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, offsetTextureVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(textureCoordinatesOffset), textureCoordinatesOffset, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(2);
+    glVertexAttribDivisor(2, 1);
+    */
+
 
     glBindVertexArray(0);
 

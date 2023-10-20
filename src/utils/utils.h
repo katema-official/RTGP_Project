@@ -35,7 +35,7 @@ glm::vec4 getColorFromID(int ID);
 //<true, id> if the texture, of id "id", was correctly created
 std::tuple<bool, unsigned int, int*> generateBitmapFont(const std::string& fontFilename, const int fontSize, const std::string& bitmapFilename, const std::string& widthsFilename);
 
-
-float* getTextureCoordinatesOfCharacterInBitmap(char c);
+//will return ad offset on the x and y axis to sum over the standard/initial texture coordinates
+glm::vec2 getTextureCoordinatesOffsetOfCharacterInBitmap(char c);
 
 

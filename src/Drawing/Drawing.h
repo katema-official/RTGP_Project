@@ -72,7 +72,7 @@ void drawAllBridgesInTree(std::vector<TreeNode*> originalNodesVector, int count,
 
 
 
-unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::vec3> nodesPositions, int* textWidths);
+unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::vec3> nodesPositions, int* textWidths, int& lettersCount);
 
 unsigned int loadAndReturnBitmapTexture(const std::string& bitmapName);
 
