@@ -144,15 +144,16 @@ int main2()
     hContainerTrue = dimsTrue.y;
 
 
-    std::vector<int> modelIndices;
-    unsigned int VAO_Nodes = getVAOWithDataToDrawNodesInTree(modelIndices, treeNodesVector);
+    std::vector<int> modelIndices;  //vector with the explorationIDs in the order they will be explored by addModelMatrix_Nodes (recursive function called by getVAOWithDataToDrawNodesInTree)
+    std::vector<glm::vec3> nodesPositions;   //these two vectors will be useful to know which node (through its explorationID) is associated to which position in space
+    unsigned int VAO_Nodes = getVAOWithDataToDrawNodesInTree(modelIndices, nodesPositions, treeNodesVector);
 
     int bridgesCount = 0;
     unsigned int VAO_Bridges = getVAOWithDataToDrawBridgesInTree(bridgesCount, treeNodesVector);
 
 
     //############################################################################
-    std::string fontName = "Impact";
+    std::string fontName = "Impact";    //Change this name accordingly to change the font
     std::tuple<bool, unsigned int, int*> generatedTexture = generateBitmapFont("../fonts/" + fontName + ".ttf", 50, "bitmapfont" + fontName + ".bmp", "bitmapfont_widths" + fontName + ".txt");
     
     unsigned int textTexture;
@@ -161,7 +162,6 @@ int main2()
     if(std::get<0>(generatedTexture)) textWidths = std::get<2>(generatedTexture);
     unsigned int VAO_provaTesto = getVAOProvaTesto();
     Shader provaTestoShader("./shadersTextInstancing/shader_prova_testo.vs", "./shadersTextInstancing/shader_prova_testo.fs");
-    //unsigned int textTexture2 = loadAndReturnBitmapTexture();
     
     
 

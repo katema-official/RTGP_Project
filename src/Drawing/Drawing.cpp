@@ -513,7 +513,7 @@ void drawWholeTreeText(TreeNode* node, std::vector<TreeNode*> nodesVector, Shade
 
 
 //actually we also add the colors
-void addModelMatrix_Nodes(std::vector<glm::mat4>& modelVector, std::vector<glm::vec4>& colorVector, std::vector<int>& indicesVector, TreeNode* node, std::vector<TreeNode*> nodesVector)
+void addModelMatrix_Nodes(std::vector<glm::mat4>& modelVector, std::vector<glm::vec4>& colorVector, std::vector<int>& indicesVector, std::vector<glm::vec3>& nodesPositions, TreeNode* node, std::vector<TreeNode*> nodesVector)
 {
     indicesVector.push_back(node->explorationID);
 
@@ -524,6 +524,7 @@ void addModelMatrix_Nodes(std::vector<glm::mat4>& modelVector, std::vector<glm::
 
     //the model matrix of a node just needs to be translated
     glm::vec3 posNode(coordinatesNewNodeToDraw.x, -1.0 * node->level * verticalSpaceBetweenLevels, coordinatesNewNodeToDraw.z);
+    nodesPositions.push_back(posNode);
     glm::mat4 modelNode = glm::mat4(1.0f);
     modelNode = glm::translate(modelNode, posNode);
 
@@ -553,7 +554,7 @@ void addModelMatrix_Nodes(std::vector<glm::mat4>& modelVector, std::vector<glm::
             }
 
             //recursive call
-            addModelMatrix_Nodes(modelVector, colorVector, indicesVector, child, nodesVector);
+            addModelMatrix_Nodes(modelVector, colorVector, indicesVector, nodesPositions, child, nodesVector);
 
             currentChildLocalIndex++;
         }
@@ -636,13 +637,13 @@ void addModelMatrix_Bridges(std::vector<glm::mat4>& modelVector, std::vector<glm
 
 
 //let's generate the transformation matrices
-unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std::vector<TreeNode*> nodesVector)
+unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std::vector<glm::vec3>& nodesPositions, std::vector<TreeNode*> nodesVector)
 {
     //first, we get the model matrices
     std::vector<glm::mat4> modelMatrices;
     std::vector<glm::vec4> colors;
 
-    addModelMatrix_Nodes(modelMatrices, colors, modelIndices, nodesVector.at(0), nodesVector);
+    addModelMatrix_Nodes(modelMatrices, colors, modelIndices, nodesPositions, nodesVector.at(0), nodesVector);
 
     int nNodes = nodesVector.size();
     glm::mat4* modelMatricesArray = new glm::mat4[nNodes];
@@ -874,18 +875,25 @@ unsigned int getVAOProvaTesto()
         1, 2, 3                 //are ordered like this: bottom-left, bottom-right, top-left, top-right
     };
 
-    float* textureCoordinates = getTextureCoordinatesOfCharacterInBitmap('$');
+    float* textureCoordinates = getTextureCoordinatesOfCharacterInBitmap('p');
 
     float x0_texture = textureCoordinates[0];
     float y0_texture = textureCoordinates[1];
     float x1_texture = textureCoordinates[2];
     float y1_texture = textureCoordinates[3];
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,   x0_texture, y0_texture,
-        0.5f, -0.5f, 0.0f,    x1_texture, y0_texture,
-        -0.5f, 0.5f, 0.0f,    x0_texture, y1_texture,
-        0.5f, 0.5f, 0.0f,     x1_texture, y1_texture
+        -0.5f, -0.5f, 0.0f, //  x0_texture, y0_texture,
+        0.5f, -0.5f, 0.0f,  //  x1_texture, y0_texture,
+        -0.5f, 0.5f, 0.0f,  //  x0_texture, y1_texture,
+        0.5f, 0.5f, 0.0f,   //  x1_texture, y1_texture
     };
+    float textureCoordinatesForVBO[] = {
+        x0_texture, y0_texture,
+        x1_texture, y0_texture,
+        x0_texture, y1_texture,
+        x1_texture, y1_texture
+    };
+    delete[] textureCoordinates;
 
     glGenVertexArrays(1, &buffers[0]);
     glGenBuffers(1, &buffers[1]);
@@ -900,9 +908,17 @@ unsigned int getVAOProvaTesto()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+
+
+    unsigned int textureVBO;
+    glGenBuffers(1, &textureVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(textureCoordinatesForVBO), textureCoordinatesForVBO, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);

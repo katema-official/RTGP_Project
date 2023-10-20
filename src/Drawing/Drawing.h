@@ -60,7 +60,7 @@ void drawWholeTreeText(TreeNode* node, std::vector<TreeNode*> nodesVector, Shade
 
 
 
-unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std::vector<TreeNode*> nodesVector);
+unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std::vector<glm::vec3>& nodesPositions, std::vector<TreeNode*> nodesVector);
 
 unsigned int getVAOWithDataToDrawBridgesInTree(int& count, std::vector<TreeNode*> nodesVector);
 
