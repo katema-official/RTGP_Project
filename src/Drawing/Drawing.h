@@ -68,11 +68,13 @@ void drawAllNodesInTree(std::vector<TreeNode*> originalNodesVector, std::vector<
 
 void drawAllBridgesInTree(std::vector<TreeNode*> originalNodesVector, int count, Shader& nodeInTreeShader, unsigned int VAO_Nodes, Camera camera, glm::mat4 view, glm::mat4 projection);
 
+void drawTextInTree(int lettersCount, Shader& textInTreeShader, unsigned int VAO_textInTree, Camera camera, glm::mat4 view, glm::mat4 projection, unsigned int bitmapTexture);
 
 
 
 
-unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::vec3> nodesPositions, int* textWidths, int& lettersCount);
+
+unsigned int getVAONodesText(std::vector<std::string> stringsVector, std::vector<glm::vec3> nodesPositions, int* textWidths, int& lettersCount, float xOffset, float yOffset, float scale);
 
 unsigned int loadAndReturnBitmapTexture(const std::string& bitmapName);
 

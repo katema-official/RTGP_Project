@@ -852,7 +852,26 @@ void drawAllBridgesInTree(std::vector<TreeNode*> originalNodesVector, int count,
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, amount);
 }
 
+void drawTextInTree(int lettersCount, Shader& textInTreeShader, unsigned int VAO_textInTree, Camera camera, glm::mat4 view, glm::mat4 projection, unsigned int bitmapTexture)
+{
+    //glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, bitmapTexture);
+    textInTreeShader.use();
+    textInTreeShader.setMat4("projection", projection);
+    textInTreeShader.setMat4("view", view);
+    //glm::mat4 model = glm::mat4(1.0f);
+    //provaTestoShader.setMat4("model", model);
+    textInTreeShader.setVec4("textColor", glm::vec4(0.0, 0.0, 0.0, 1.0));
+    glBindVertexArray(VAO_textInTree);
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, lettersCount);
+
+    glDisable(GL_BLEND);
+    //glDisable(GL_CULL_FACE);
+}
 
 
 
@@ -863,7 +882,7 @@ void drawAllBridgesInTree(std::vector<TreeNode*> originalNodesVector, int count,
 
 
 void addModelMatrixAndTextureCoordinates_Nodes(std::vector<std::string> stringsVector, std::vector<glm::vec3> nodesPositions, int* textWidths, int nTextWidths,
-    std::vector<glm::mat4>& modelMatrices, std::vector<glm::vec2>& textureOffsets, float scaleFactor, int& count)
+    std::vector<glm::mat4>& modelMatrices, std::vector<glm::vec2>& textureOffsets, float xOffset, float yOffset, float scaleFactor, int& count)
 {
     for(int index = 0; index < stringsVector.size(); index++)   //for each string that we want to draw
     {
@@ -885,10 +904,8 @@ void addModelMatrixAndTextureCoordinates_Nodes(std::vector<std::string> stringsV
         //and let's also get the right transformation matrix for each single letter
         glm::vec3 nodeCenter = nodesPositions.at(index);
         glm::vec3 currentPosition = nodeCenter + glm::vec3(0.0, 0.0, 10.0);
-        float yOffset_1 = 0.05f;
-        currentPosition.y -= yOffset_1;
-        float xOffset_1 = 0.40f;
-        currentPosition.x -= xOffset_1;
+        currentPosition.y += yOffset;
+        currentPosition.x += xOffset;
         for(int i = 0; i < length; i++)
         {
             glm::mat4 modelLetter = glm::mat4(1.0f);
@@ -898,7 +915,7 @@ void addModelMatrixAndTextureCoordinates_Nodes(std::vector<std::string> stringsV
             
             char letter = lettersArray[i];
             int k = (int) letter;
-            float width = ((float) textWidths[k] / 48.0) * scaleFactor;
+            float width = ((float) textWidths[k] / 48.0) * scaleFactor; //TODO: in case, modify
             currentPosition.x += width;
             currentPosition.z += 0.001f; //so that the next gliph goes "on top" of the prevoius one
         }
@@ -906,14 +923,8 @@ void addModelMatrixAndTextureCoordinates_Nodes(std::vector<std::string> stringsV
 
 }
 
-unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::vec3> nodesPositions, int* textWidths, int& lettersCount)
+unsigned int getVAONodesText(std::vector<std::string> stringsVector, std::vector<glm::vec3> nodesPositions, int* textWidths, int& lettersCount, float xOffset, float yOffset, float scale)
 {
-    //we have to convert the explorationIDs of the indicesVector, that are ints, in strings
-    std::vector<std::string> explorationIDsVector;
-    for(int expID : indicesVector)
-    {
-        explorationIDsVector.push_back(std::to_string(expID));
-    }
     int nTextWidths = 128;  //textWidths has a standard length: 128
 
     std::vector<glm::mat4> modelVector;
@@ -926,8 +937,7 @@ unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::ve
     //This is because each position of these vectors will correspond to an instance that will 
     //be drawn from the same quad, where each instance is differen from the others because of 
     //its transform matrix and its texture offset (that determines the glyph drawn)
-    float scale = 0.2;
-    addModelMatrixAndTextureCoordinates_Nodes(explorationIDsVector, nodesPositions, textWidths, nTextWidths, modelVector, offsetCoordinatesVector, scale, lettersCount);
+    addModelMatrixAndTextureCoordinates_Nodes(stringsVector, nodesPositions, textWidths, nTextWidths, modelVector, offsetCoordinatesVector, xOffset, yOffset, scale, lettersCount);
     
     int nLettersTotal = lettersCount;
     glm::mat4* modelLettersArray = new glm::mat4[nLettersTotal];

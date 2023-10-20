@@ -102,7 +102,7 @@ int main2()
     // ------------------------------------
     Shader nodeInTreeShader("shader_node_in_tree.vs", "shader_node_in_tree.fs");
     Shader textShaderInSpace("shader_text_in_space.vs", "shader_text_in_space.fs");
-
+    Shader textInTreeShader("./shadersTextInstancing/shader_prova_testo.vs", "./shadersTextInstancing/shader_prova_testo.fs");
 
     
 
@@ -160,9 +160,30 @@ int main2()
     int* textWidths;
     if(std::get<0>(generatedTexture)) textTexture = std::get<1>(generatedTexture);
     if(std::get<0>(generatedTexture)) textWidths = std::get<2>(generatedTexture);
-    int lettersCount = 0;   //how many letters need to be drawn
-    unsigned int VAO_provaTesto = getVAONodesText(nodesIndices, nodesPositions, textWidths, lettersCount);
-    Shader provaTestoShader("./shadersTextInstancing/shader_prova_testo.vs", "./shadersTextInstancing/shader_prova_testo.fs");
+    
+    //we have to convert the explorationIDs of the indicesVector, that are ints, in strings
+    std::vector<std::string> explorationIDsVector;
+    for(int expID : nodesIndices)
+    {
+        explorationIDsVector.push_back(std::to_string(expID));
+    }
+    float xOffset = -0.35;
+    float yOffset = -0.15;
+    float scale = 0.3;
+    int lettersCount_explorationIDs = 0;   //how many letters need to be drawn
+    unsigned int VAOText_explorationIDs = getVAONodesText(explorationIDsVector, nodesPositions, textWidths, lettersCount_explorationIDs, xOffset, yOffset, scale);
+
+    std::vector<std::string> explorationIDsVector_plainText;
+    for(int i = 0; i < numberOfNodes; i++)
+    {
+        explorationIDsVector_plainText.push_back("Exploration ID:");
+    }
+    xOffset = -0.40;
+    yOffset = 0.10;
+    scale = 0.15;
+    int lettersCount_explorationIDs_plainText = 0;
+    unsigned int VAOText_explorationIDs_plainText = getVAONodesText(explorationIDsVector_plainText, nodesPositions, textWidths, lettersCount_explorationIDs_plainText, xOffset, yOffset, scale);
+
     
     glEnable(GL_DEPTH_TEST);
     // render loop
@@ -200,25 +221,9 @@ int main2()
         drawAllBridgesInTree(treeNodesVector, bridgesCount, nodeInTreeShader, VAO_Bridges, camera, view, projection);
         //drawAllNodesTextInTree(treeNodesVector, modelIndices, nodeInTreeShader, ???, camera, view, projection);
 
-
-        //glEnable(GL_CULL_FACE);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textTexture);
-        provaTestoShader.use();
-        provaTestoShader.setMat4("projection", projection);
-        provaTestoShader.setMat4("view", view);
-        //glm::mat4 model = glm::mat4(1.0f);
-        //provaTestoShader.setMat4("model", model);
-        provaTestoShader.setVec4("textColor", glm::vec4(0.0, 0.0, 0.0, 1.0));
-        glBindVertexArray(VAO_provaTesto);
-        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, lettersCount);
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        glDisable(GL_BLEND);
-        //glDisable(GL_CULL_FACE);
+        drawTextInTree(lettersCount_explorationIDs, textInTreeShader, VAOText_explorationIDs, camera, view, projection, textTexture);
+        drawTextInTree(lettersCount_explorationIDs_plainText, textInTreeShader, VAOText_explorationIDs_plainText, camera, view, projection, textTexture);
+        
 
         
 
