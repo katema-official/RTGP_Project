@@ -616,7 +616,7 @@ std::tuple<bool, unsigned int, int*> generateBitmapFont(const std::string& fontF
         return std::make_tuple(false, 0, nullptr);
     }
 
-    delete[] widths;
+    //delete[] widths;
 
     
 

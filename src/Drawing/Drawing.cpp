@@ -637,13 +637,13 @@ void addModelMatrix_Bridges(std::vector<glm::mat4>& modelVector, std::vector<glm
 
 
 //let's generate the transformation matrices
-unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std::vector<glm::vec3>& nodesPositions, std::vector<TreeNode*> nodesVector)
+unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& nodesIndices, std::vector<glm::vec3>& nodesPositions, std::vector<TreeNode*> nodesVector)
 {
     //first, we get the model matrices
     std::vector<glm::mat4> modelMatrices;
     std::vector<glm::vec4> colors;
 
-    addModelMatrix_Nodes(modelMatrices, colors, modelIndices, nodesPositions, nodesVector.at(0), nodesVector);
+    addModelMatrix_Nodes(modelMatrices, colors, nodesIndices, nodesPositions, nodesVector.at(0), nodesVector);
 
     int nNodes = nodesVector.size();
     glm::mat4* modelMatricesArray = new glm::mat4[nNodes];
@@ -863,10 +863,34 @@ void drawAllBridgesInTree(std::vector<TreeNode*> originalNodesVector, int count,
 
 
 
-
-
-unsigned int getVAOProvaTesto()
+void addModelMatrixAndTextureCoordinates_Nodes(std::vector<int> indicesVector, std::vector<glm::vec3> nodesPotisions, int* textWidths, int nTextWidths)
 {
+
+}
+
+unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::vec3> nodesPositions, int* textWidths)
+{
+    //we have to convert the explorationIDs of the indicesVector, that are ints, in strings
+    std::vector<std::string> explorationIDsVector;
+    for(int expID : indicesVector)
+    {
+        explorationIDsVector.push_back(std::to_string(expID));
+    }
+    int nTextWidths = 128;  //textWidths has a standard length: 128
+
+    std::vector<glm::mat4> modelVector;
+    std::vector<glm::vec2> offsetCoordinatesVector;
+
+    //given all the texts we have to render and the position in space of their corresponding node,
+    //we have to produce two vectors:
+    //-one with the positions           of each individual character of each text
+    //-one with the texture coordinates of each individual character of each text
+
+
+
+
+
+
 
     unsigned int* buffers = new unsigned int[3]; //there will be the VAO, the VBO and the EBO
 

@@ -144,9 +144,9 @@ int main2()
     hContainerTrue = dimsTrue.y;
 
 
-    std::vector<int> modelIndices;  //vector with the explorationIDs in the order they will be explored by addModelMatrix_Nodes (recursive function called by getVAOWithDataToDrawNodesInTree)
+    std::vector<int> nodesIndices;  //vector with the explorationIDs in the order they will be explored by addModelMatrix_Nodes (recursive function called by getVAOWithDataToDrawNodesInTree)
     std::vector<glm::vec3> nodesPositions;   //these two vectors will be useful to know which node (through its explorationID) is associated to which position in space
-    unsigned int VAO_Nodes = getVAOWithDataToDrawNodesInTree(modelIndices, nodesPositions, treeNodesVector);
+    unsigned int VAO_Nodes = getVAOWithDataToDrawNodesInTree(nodesIndices, nodesPositions, treeNodesVector);
 
     int bridgesCount = 0;
     unsigned int VAO_Bridges = getVAOWithDataToDrawBridgesInTree(bridgesCount, treeNodesVector);
@@ -160,7 +160,7 @@ int main2()
     int* textWidths;
     if(std::get<0>(generatedTexture)) textTexture = std::get<1>(generatedTexture);
     if(std::get<0>(generatedTexture)) textWidths = std::get<2>(generatedTexture);
-    unsigned int VAO_provaTesto = getVAOProvaTesto();
+    unsigned int VAO_provaTesto = getVAONodesText(nodesIndices, nodesPositions, textWidths);
     Shader provaTestoShader("./shadersTextInstancing/shader_prova_testo.vs", "./shadersTextInstancing/shader_prova_testo.fs");
     
     
@@ -197,7 +197,7 @@ int main2()
         glm::mat4 view = camera.GetViewMatrix();
         
 
-        drawAllNodesInTree(treeNodesVector, modelIndices, nodeInTreeShader, VAO_Nodes, camera, view, projection);
+        drawAllNodesInTree(treeNodesVector, nodesIndices, nodeInTreeShader, VAO_Nodes, camera, view, projection);
         drawAllBridgesInTree(treeNodesVector, bridgesCount, nodeInTreeShader, VAO_Bridges, camera, view, projection);
         //drawAllNodesTextInTree(treeNodesVector, modelIndices, nodeInTreeShader, ???, camera, view, projection);
 

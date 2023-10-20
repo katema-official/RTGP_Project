@@ -60,7 +60,7 @@ void drawWholeTreeText(TreeNode* node, std::vector<TreeNode*> nodesVector, Shade
 
 
 
-unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& modelIndices, std::vector<glm::vec3>& nodesPositions, std::vector<TreeNode*> nodesVector);
+unsigned int getVAOWithDataToDrawNodesInTree(std::vector<int>& nodesIndices, std::vector<glm::vec3>& nodesPositions, std::vector<TreeNode*> nodesVector);
 
 unsigned int getVAOWithDataToDrawBridgesInTree(int& count, std::vector<TreeNode*> nodesVector);
 
@@ -72,7 +72,7 @@ void drawAllBridgesInTree(std::vector<TreeNode*> originalNodesVector, int count,
 
 
 
-unsigned int getVAOProvaTesto();
+unsigned int getVAONodesText(std::vector<int> indicesVector, std::vector<glm::vec3> nodesPositions, int* textWidths);
 
 unsigned int loadAndReturnBitmapTexture(const std::string& bitmapName);
 
