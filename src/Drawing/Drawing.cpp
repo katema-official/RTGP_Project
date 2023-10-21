@@ -863,8 +863,6 @@ void drawTextInTree(int lettersCount, Shader& textInTreeShader, unsigned int VAO
     textInTreeShader.use();
     textInTreeShader.setMat4("projection", projection);
     textInTreeShader.setMat4("view", view);
-    //glm::mat4 model = glm::mat4(1.0f);
-    //provaTestoShader.setMat4("model", model);
     textInTreeShader.setVec4("textColor", glm::vec4(0.0, 0.0, 0.0, 1.0));
     glBindVertexArray(VAO_textInTree);
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, lettersCount);
@@ -893,21 +891,20 @@ void addModelMatrixAndTextureCoordinates_Nodes(std::vector<std::string> stringsV
         char* lettersArray = new char[length + 1];
         strcpy(lettersArray, word.c_str());
 
-        //now that we have access to each single letter, let's get its texture coordinate offset
-        for(int i = 0; i < length; i++)
-        {
-            glm::vec2 texOffset = getTextureCoordinatesOffsetOfCharacterInBitmap(lettersArray[i]);
-            textureOffsets.push_back(texOffset);
-            count++;
-        }
-
-        //and let's also get the right transformation matrix for each single letter
         glm::vec3 nodeCenter = nodesPositions.at(index);
         glm::vec3 currentPosition = nodeCenter + glm::vec3(0.0, 0.0, 10.0);
         currentPosition.y += yOffset;
         currentPosition.x += xOffset;
+
+        //now that we have access to each single letter... 
         for(int i = 0; i < length; i++)
         {
+            //...let's get its texture coordinate offset
+            glm::vec2 texOffset = getTextureCoordinatesOffsetOfCharacterInBitmap(lettersArray[i]);
+            textureOffsets.push_back(texOffset);
+            count++;
+
+            //and let's also get the right transformation matrix for each single letter
             glm::mat4 modelLetter = glm::mat4(1.0f);
             modelLetter = glm::translate(modelLetter, currentPosition);
             modelLetter = glm::scale(modelLetter, glm::vec3(scaleFactor, scaleFactor, 1.0f));
