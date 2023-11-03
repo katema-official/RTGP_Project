@@ -64,6 +64,8 @@ bool clicked = false;
 int checkIfClickedOnNode(double xWorld, double yWorld, TreeNode* currentNode, std::vector<TreeNode*> treeNodesVector);
 
 
+bool focusOnNode = false;   //false = I'm watching the whole tree, true = I'm watching a particular node
+
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 25.0f));
@@ -222,7 +224,7 @@ int main2()
 
         //check if left mouse was pressed: in such case, reset state and check if it clicked
         //on something meaningful
-        if(clicked)
+        if(clicked && !focusOnNode)
         {
             clicked = false;
             int eID = checkIfClickedOnNode(worldCoordsClicked.x, worldCoordsClicked.y, treeNodesVector.at(0), treeNodesVector);
@@ -270,7 +272,7 @@ int main2()
 
 
         
-        drawSpeed(textShader, nodesToAdvance, false, 0.0, currentFrame);
+        if(focusOnNode) drawSpeed(textShader, nodesToAdvance, false, 0.0, currentFrame);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -308,7 +310,7 @@ void processInput(GLFWwindow* window)
     
     
 
-    if(shiftPressed)
+    if(focusOnNode && shiftPressed)
     {
         if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         {
@@ -361,62 +363,66 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 
-    if((key == GLFW_KEY_KP_ADD || key == GLFW_KEY_PERIOD) && action == GLFW_PRESS)
+    if(focusOnNode)
     {
-        if(nodesToAdvance < 1000000)
-        {   
-            nodesToAdvance *= 10;
-            Shader s;
-            drawSpeed(s, nodesToAdvance, true, glfwGetTime(), 0.0);
-        }
-    }
 
-    if((key == GLFW_KEY_KP_SUBTRACT || key == GLFW_KEY_COMMA) && action == GLFW_PRESS)
-    {
-        if(nodesToAdvance > 1)
+        if((key == GLFW_KEY_KP_ADD || key == GLFW_KEY_PERIOD) && action == GLFW_PRESS)
         {
-            nodesToAdvance /= 10;
-            Shader s;
-            drawSpeed(s, nodesToAdvance, true, glfwGetTime(), 0.0);
+            if(nodesToAdvance < 1000000)
+            {   
+                nodesToAdvance *= 10;
+                Shader s;
+                drawSpeed(s, nodesToAdvance, true, glfwGetTime(), 0.0);
+            }
         }
-    }
 
-    if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_PRESS)
-    {
-        shiftPressed = true;
-    }
-    if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_RELEASE)
-    {
-        shiftPressed = false;
-    }
-
-    if(!shiftPressed)
-    {
-        if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+        if((key == GLFW_KEY_KP_SUBTRACT || key == GLFW_KEY_COMMA) && action == GLFW_PRESS)
         {
-            if(currentNodeIndex + nodesToAdvance < numberOfNodes)
+            if(nodesToAdvance > 1)
             {
-                currentNodeIndex += nodesToAdvance;
-            }
-            else
-            {
-                currentNodeIndex = numberOfNodes - 1;
+                nodesToAdvance /= 10;
+                Shader s;
+                drawSpeed(s, nodesToAdvance, true, glfwGetTime(), 0.0);
             }
         }
 
-        if(key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+        if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_PRESS)
         {
-            if(currentNodeIndex - nodesToAdvance > 0)
+            shiftPressed = true;
+        }
+        if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_RELEASE)
+        {
+            shiftPressed = false;
+        }
+
+        if(!shiftPressed)
+        {
+            if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
             {
-                currentNodeIndex -= nodesToAdvance;
+                if(currentNodeIndex + nodesToAdvance < numberOfNodes)
+                {
+                    currentNodeIndex += nodesToAdvance;
+                }
+                else
+                {
+                    currentNodeIndex = numberOfNodes - 1;
+                }
             }
-            else
+
+            if(key == GLFW_KEY_LEFT && action == GLFW_PRESS)
             {
-                currentNodeIndex = 0;
+                if(currentNodeIndex - nodesToAdvance > 0)
+                {
+                    currentNodeIndex -= nodesToAdvance;
+                }
+                else
+                {
+                    currentNodeIndex = 0;
+                }
             }
         }
+
     }
-    
 }
 
 
@@ -430,7 +436,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 //glfw: detect mouse click
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) 
+    if(!focusOnNode && button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) 
     {
         double xpos, ypos;
         //getting cursor position
