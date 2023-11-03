@@ -39,12 +39,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow* window);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 
 bool shiftPressed = false;
-
-
 
 
 int currentNodeIndex = 0;
@@ -52,9 +50,14 @@ int numberOfNodes;
 int nodesToAdvance = 1;
 
 
-
 float lastFrame = 0.0;
 float deltaTime = 0.0;
+
+
+int CURRENT_SCR_WIDTH;
+int CURRENT_SCR_HEIGHT;
+glm::mat4 projection;
+glm::mat4 view;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 25.0f));
@@ -81,10 +84,13 @@ int main2()
         glfwTerminate();
         return -1;
     }
+    CURRENT_SCR_WIDTH = SCR_WIDTH;
+    CURRENT_SCR_HEIGHT = SCR_HEIGHT;
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 
     // glad: load all OpenGL function pointers
@@ -101,8 +107,7 @@ int main2()
     // build and compile our shader program
     // ------------------------------------
     Shader nodeInTreeShader("shader_node_in_tree.vs", "shader_node_in_tree.fs");
-    Shader textShaderInSpace("shader_text_in_space.vs", "shader_text_in_space.fs");
-    Shader textInTreeShader("./shadersTextInstancing/shader_prova_testo.vs", "./shadersTextInstancing/shader_prova_testo.fs");
+    Shader textInTreeShader("./shadersTextInstancing/shader_text_in_space.vs", "./shadersTextInstancing/shader_text_in_space.fs");
 
     
 
@@ -212,9 +217,9 @@ int main2()
 
         //############################################################
         float aspect = ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
-        glm::mat4 projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.1f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
+        projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.1f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
         // camera/view transformation
-        glm::mat4 view = camera.GetViewMatrix();
+        view = camera.GetViewMatrix();
         
 
         drawAllNodesInTree(treeNodesVector, nodesIndices, nodeInTreeShader, VAO_Nodes, camera, view, projection);
@@ -227,14 +232,6 @@ int main2()
 
         
 
-
-        
-
-
-        /*textShaderInSpace.use();
-        textShaderInSpace.setMat4("projection", projection);
-        textShaderInSpace.setMat4("view", view);
-        drawWholeTreeText(treeNodesVector.at(0), treeNodesVector, textShaderInSpace, buffersForNodeInTree, camera, view, projection);*/
 
         
 
@@ -329,6 +326,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+    CURRENT_SCR_WIDTH = width;
+    CURRENT_SCR_HEIGHT = height;
+    //std::cout << "window width = " << width << ", window height = " << height;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -400,8 +400,23 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
+//glfw: detect mouse click
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) 
+    {
+        double xpos, ypos;
+        //getting cursor position
+        glfwGetCursorPos(window, &xpos, &ypos);
+        std::cout << "Cursor Position at (" << xpos << " : " << ypos << std::endl;
 
-
+        double xPos_NDC = xpos / ((double) CURRENT_SCR_WIDTH / 2.0) - 1.0;
+        double yPos_NDC = (ypos / ((double) CURRENT_SCR_HEIGHT / 2.0) - 1.0) * (-1.0);
+        //no need to reverse perspective devide: https://antongerdelan.net/opengl/raycasting.html
+        glm::vec4 viewCoords = glm::inverse(projection) * glm::vec4(xPos_NDC, yPos_NDC, 0, 1);
+        glm::vec4 worldCoords = glm::inverse(view) * viewCoords;
+    }
+}
 
 
 
