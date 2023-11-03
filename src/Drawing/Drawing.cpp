@@ -524,6 +524,7 @@ void addModelMatrix_Nodes(std::vector<glm::mat4>& modelVector, std::vector<glm::
     //the model matrix of a node just needs to be translated
     glm::vec3 posNode(coordinatesNewNodeToDraw.x, -1.0 * node->level * verticalSpaceBetweenLevels, coordinatesNewNodeToDraw.z);
     nodesPositions.push_back(posNode);
+    node->positionInTree = posNode;
     glm::mat4 modelNode = glm::mat4(1.0f);
     modelNode = glm::translate(modelNode, posNode);
 

@@ -58,9 +58,16 @@ int CURRENT_SCR_WIDTH;
 int CURRENT_SCR_HEIGHT;
 glm::mat4 projection;
 glm::mat4 view;
+glm::vec4 worldCoordsClicked;
+bool clicked = false;
+
+int checkIfClickedOnNode(double xWorld, double yWorld, TreeNode* currentNode, std::vector<TreeNode*> treeNodesVector);
+
+
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 25.0f));
+
 
 int main2()
 {
@@ -189,6 +196,17 @@ int main2()
     int lettersCount_explorationIDs_plainText = 0;
     unsigned int VAOText_explorationIDs_plainText = getVAONodesText(explorationIDsVector_plainText, nodesPositions, textWidths, lettersCount_explorationIDs_plainText, xOffset, yOffset, scale);
 
+
+
+    //DEBUG
+    /*
+    for(TreeNode* node : treeNodesVector)
+    {
+        std::cout << "node " << node->explorationID << ", pos: (" << node->positionInTree.x << ", " <<
+            node->positionInTree.y << ", " << node->positionInTree.z << ")" << std::endl;
+    }
+    */
+
     
     glEnable(GL_DEPTH_TEST);
     // render loop
@@ -201,6 +219,15 @@ int main2()
         // input
         // -----
         processInput(window);
+
+        //check if left mouse was pressed: in such case, reset state and check if it clicked
+        //on something meaningful
+        if(clicked)
+        {
+            clicked = false;
+            int eID = checkIfClickedOnNode(worldCoordsClicked.x, worldCoordsClicked.y, treeNodesVector.at(0), treeNodesVector);
+            //std::cout << "CLICKED ON NODE " << eID << std::endl;
+        }
 
         // render
         // ------
@@ -408,13 +435,15 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         double xpos, ypos;
         //getting cursor position
         glfwGetCursorPos(window, &xpos, &ypos);
-        std::cout << "Cursor Position at (" << xpos << " : " << ypos << std::endl;
+        //std::cout << "Cursor Position at (" << xpos << " : " << ypos << ")" << std::endl;
 
         double xPos_NDC = xpos / ((double) CURRENT_SCR_WIDTH / 2.0) - 1.0;
         double yPos_NDC = (ypos / ((double) CURRENT_SCR_HEIGHT / 2.0) - 1.0) * (-1.0);
         //no need to reverse perspective devide: https://antongerdelan.net/opengl/raycasting.html
         glm::vec4 viewCoords = glm::inverse(projection) * glm::vec4(xPos_NDC, yPos_NDC, 0, 1);
-        glm::vec4 worldCoords = glm::inverse(view) * viewCoords;
+        worldCoordsClicked = glm::inverse(view) * viewCoords;
+        //std::cout << "World coords clicked: (" << worldCoordsClicked.x << " : " << worldCoordsClicked.y << ")" << std::endl;
+        clicked = true;
     }
 }
 
@@ -422,10 +451,43 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 
 
+int checkIfClickedOnNode(double xWorld, double yWorld, TreeNode* currentNode, std::vector<TreeNode*> treeNodesVector)
+{
+    float halfLength = 0.5f;
 
+    //rejection test: the current node examined in the search is below the coordinates requested
+    if(currentNode->positionInTree.y + halfLength < yWorld)
+    {
+        return -1;
+    }
 
+    //first, check if the mouse click intersected exactly this node
+    if(xWorld > (currentNode->positionInTree.x - halfLength) && xWorld < (currentNode->positionInTree.x + halfLength) &&
+        yWorld > (currentNode->positionInTree.y - halfLength) && yWorld < (currentNode->positionInTree.y + halfLength))
+    {
+        return currentNode->explorationID;
+    }
+    
+    //if not, proceed the search, looking at all the children of this node. Their positions
+    //are ordered from the leftmost to the rightmost (in world coordinates), so we have to continue
+    //the search on the last node that is still on the left wrt the click position.
+    //To check if a node is on the left wrt the click position, we check its left face/edge.
+    int promisingExpID = -1;
+    for(int child_eID : currentNode->childNodesExplorationID)
+    {
+        TreeNode* childNode = treeNodesVector.at(child_eID);
+        if((childNode->positionInTree.x - halfLength) < xWorld)
+        {
+            promisingExpID = child_eID;
+        }
+    }
 
+    //If I had no children, I return failure
+    if(promisingExpID == -1) return -1;
 
+    //If I have a promising children, I continue the search
+    return checkIfClickedOnNode(xWorld, yWorld, treeNodesVector.at(promisingExpID), treeNodesVector);
+}
 
 
 
