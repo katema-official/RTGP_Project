@@ -233,6 +233,7 @@ int main2()
             //std::cout << "CLICKED ON NODE " << eID << std::endl;
             if(eID != -1)
             {
+                glDisable(GL_DEPTH_TEST);
                 focusOnNode = true;
                 currentNodeIndex = eID;
             }
@@ -243,15 +244,15 @@ int main2()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        
-        
-
-        //drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
-
-        //drawNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
-        
-
         //############################################################
+
+        if(focusOnNode)
+        {
+            drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
+            drawNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
+            drawSpeed(textShader, nodesToAdvance, false, 0.0, currentFrame);
+        }
+        
         if(!focusOnNode)
         {
             float aspect = ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
@@ -270,18 +271,12 @@ int main2()
         }
         
 
-
-        
-
         //############################################################
 
         // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
         // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
         glBindVertexArray(0);
 
-
-        
-        if(focusOnNode) drawSpeed(textShader, nodesToAdvance, false, 0.0, currentFrame);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -439,6 +434,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         if(key == GLFW_KEY_SPACE && action == GLFW_PRESS)
         {
             focusOnNode = false;
+            glEnable(GL_DEPTH_TEST);
         }
     }
 }

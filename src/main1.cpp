@@ -144,13 +144,7 @@ int main1()
 
 
         drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
-
         drawNode_v1(treeNodesVector.at(currentNodeIndex), buffersForBox, wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, textShader);
-        
-
-
-
-        
         drawSpeed(textShader, nodesToAdvance, false, 0.0, currentFrame);
 
 
