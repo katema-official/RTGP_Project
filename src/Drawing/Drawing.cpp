@@ -398,6 +398,7 @@ void drawSpeed(Shader& shader, int speed, bool updated, float _initialTimeNewSpe
 //################# FUNCTIONS RELATIVE TO THE TREE RENDERING #################
 //############################################################################
 
+//currently unused
 unsigned int* getBuffersWithDataToDrawRectangleNode()
 {
     unsigned int* buffers = new unsigned int[3]; //there will be the VAO, the VBO and the EBO
@@ -1109,7 +1110,7 @@ unsigned int loadAndReturnBitmapTexture(const std::string& bitmapName)
 
 
 
-
+//funzione di prova per capire i vari Object, inutile nell'applicazione finale
 unsigned int* getVAOs()
 {
     unsigned int* VAOs = new unsigned int[2];

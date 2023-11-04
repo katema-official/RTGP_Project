@@ -115,6 +115,8 @@ int main2()
 
     // build and compile our shader program
     // ------------------------------------
+    Shader boxShader("shader_node_info.vs", "shader_node_info.fs");
+
     Shader nodeInTreeShader("shader_node_in_tree.vs", "shader_node_in_tree.fs");
     Shader textInTreeShader("./shadersTextInstancing/shader_text_in_space.vs", "./shadersTextInstancing/shader_text_in_space.fs");
 
@@ -128,8 +130,8 @@ int main2()
     int hContainer = 0;
     std::vector<Box*> obstaclesVector;
     std::vector<TreeNode*> treeNodesVector;
-    float wThickness = 0.02;
     float hThickness = 0.012;
+    float wThickness = hThickness * ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
     float maxPortionDedicatedToContainer = 0.8;
 
     readNodesInformations(wContainer, hContainer, obstaclesVector, treeNodesVector);
@@ -142,9 +144,8 @@ int main2()
     
     std::cout << "Global Optimum ID = " << globalOptimumID << std::endl;
     
-    //unsigned int* buffersForBox = getBuffersToDrawBoxShape();
-    unsigned int* buffersForNodeInTree = getBuffersWithDataToDrawRectangleNode();
-
+    unsigned int* buffersForBox = getBuffersToDrawBoxShape();   //for a specific node
+    
 
     glBindVertexArray(0);
 
@@ -158,6 +159,7 @@ int main2()
     hContainerTrue = dimsTrue.y;
 
 
+    //additional code (different from main1) for the tree rendering
     std::vector<int> nodesIndices;  //vector with the explorationIDs in the order they will be explored by addModelMatrix_Nodes (recursive function called by getVAOWithDataToDrawNodesInTree)
     std::vector<glm::vec3> nodesPositions;   //these two vectors will be useful to know which node (through its explorationID) is associated to which position in space
     unsigned int VAO_Nodes = getVAOWithDataToDrawNodesInTree(nodesIndices, nodesPositions, treeNodesVector);
@@ -229,6 +231,11 @@ int main2()
             clicked = false;
             int eID = checkIfClickedOnNode(worldCoordsClicked.x, worldCoordsClicked.y, treeNodesVector.at(0), treeNodesVector);
             //std::cout << "CLICKED ON NODE " << eID << std::endl;
+            if(eID != -1)
+            {
+                focusOnNode = true;
+                currentNodeIndex = eID;
+            }
         }
 
         // render
@@ -245,20 +252,22 @@ int main2()
         
 
         //############################################################
-        float aspect = ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
-        projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.1f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
-        // camera/view transformation
-        view = camera.GetViewMatrix();
+        if(!focusOnNode)
+        {
+            float aspect = ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
+            projection = glm::ortho(-aspect * camera.Zoom, aspect * camera.Zoom, -1.0f * camera.Zoom, 1.0f * camera.Zoom, -1.1f, 1000.0f);     //https://stackoverflow.com/questions/71810164/glmortho-doesnt-display-anything
+            // camera/view transformation
+            view = camera.GetViewMatrix();
+            
+
+            drawAllNodesInTree(treeNodesVector, nodesIndices, nodeInTreeShader, VAO_Nodes, camera, view, projection);
+            drawAllBridgesInTree(treeNodesVector, bridgesCount, nodeInTreeShader, VAO_Bridges, camera, view, projection);
+            //drawAllNodesTextInTree(treeNodesVector, modelIndices, nodeInTreeShader, ???, camera, view, projection);
+
+            drawTextInTree(lettersCount_explorationIDs, textInTreeShader, VAOText_explorationIDs, camera, view, projection, textTexture);
+            drawTextInTree(lettersCount_explorationIDs_plainText, textInTreeShader, VAOText_explorationIDs_plainText, camera, view, projection, textTexture);
         
-
-        drawAllNodesInTree(treeNodesVector, nodesIndices, nodeInTreeShader, VAO_Nodes, camera, view, projection);
-        drawAllBridgesInTree(treeNodesVector, bridgesCount, nodeInTreeShader, VAO_Bridges, camera, view, projection);
-        //drawAllNodesTextInTree(treeNodesVector, modelIndices, nodeInTreeShader, ???, camera, view, projection);
-
-        drawTextInTree(lettersCount_explorationIDs, textInTreeShader, VAOText_explorationIDs, camera, view, projection, textTexture);
-        drawTextInTree(lettersCount_explorationIDs_plainText, textInTreeShader, VAOText_explorationIDs_plainText, camera, view, projection, textTexture);
-        
-
+        }
         
 
 
@@ -299,49 +308,54 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(UPWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(DOWNWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-    
+    if(!focusOnNode)
+    {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            camera.ProcessKeyboard(UPWARD, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            camera.ProcessKeyboard(DOWNWARD, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            camera.ProcessKeyboard(LEFT, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            camera.ProcessKeyboard(RIGHT, deltaTime);
+    }
     
 
-    if(focusOnNode && shiftPressed)
+    if(focusOnNode)
     {
-        if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        if(shiftPressed)
         {
-            /*if(currentNodeIndex < numberOfNodes - 1)
+            if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
             {
-                currentNodeIndex += 1;
-            }*/
-            if(currentNodeIndex + nodesToAdvance < numberOfNodes)
+                /*if(currentNodeIndex < numberOfNodes - 1)
                 {
-                    currentNodeIndex += nodesToAdvance;
+                    currentNodeIndex += 1;
+                }*/
+                if(currentNodeIndex + nodesToAdvance < numberOfNodes)
+                    {
+                        currentNodeIndex += nodesToAdvance;
+                    }
+                    else
+                    {
+                        currentNodeIndex = numberOfNodes - 1;
+                    }
+                }
+            
+
+            if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+            {
+                /*if(currentNodeIndex > 0)
+                {
+                    currentNodeIndex -= 1;
+                }*/
+                if(currentNodeIndex - nodesToAdvance > 0)
+                {
+                    currentNodeIndex -= nodesToAdvance;
                 }
                 else
                 {
-                    currentNodeIndex = numberOfNodes - 1;
+                    currentNodeIndex = 0;
                 }
-            }
-        
-
-        if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        {
-            /*if(currentNodeIndex > 0)
-            {
-                currentNodeIndex -= 1;
-            }*/
-            if(currentNodeIndex - nodesToAdvance > 0)
-            {
-                currentNodeIndex -= nodesToAdvance;
-            }
-            else
-            {
-                currentNodeIndex = 0;
             }
         }
     }
@@ -422,6 +436,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             }
         }
 
+        if(key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+        {
+            focusOnNode = false;
+        }
     }
 }
 
@@ -430,7 +448,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    if(!focusOnNode)
+    {
+        camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    }
 }
 
 //glfw: detect mouse click

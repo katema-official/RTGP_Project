@@ -38,14 +38,9 @@ void processInput(GLFWwindow* window);
 bool shiftPressed = false;
 
 
-
-
-int CURRENT_VAO = 0;
-
 int currentNodeIndex = 0;
 int numberOfNodes;
 int nodesToAdvance = 1;
-
 
 
 float lastFrame = 0.0;
@@ -92,7 +87,7 @@ int main1()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader boxShader("shader_node_info.vs", "shader_node_info.fs"); // you can name your shader files however you like
+    Shader boxShader("shader_node_info.vs", "shader_node_info.fs");
 
 
     
@@ -105,7 +100,7 @@ int main1()
     std::vector<Box*> obstaclesVector;
     std::vector<TreeNode*> treeNodesVector;
     float hThickness = 0.012;
-    float wThickness = hThickness * ((float) SCR_WIDTH) / ((float) SCR_HEIGHT); //0.02
+    float wThickness = hThickness * ((float) SCR_WIDTH) / ((float) SCR_HEIGHT);
     float maxPortionDedicatedToContainer = 0.8;
 
     readNodesInformations(wContainer, hContainer, obstaclesVector, treeNodesVector);
@@ -118,8 +113,6 @@ int main1()
     
     unsigned int* buffersForBox = getBuffersToDrawBoxShape();
 
-
-    unsigned int* VAOs = getVAOs();
 
     glBindVertexArray(0);
 
@@ -149,12 +142,6 @@ int main1()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // render the triangle
-        /*boxShader.use();
-        glBindVertexArray(VAOs[CURRENT_VAO]);
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);   //12 is the total number of vertices used, basically 3 * the number of triangles used
-        */
 
         drawStaticInformations(wContainer, hContainer, wContainerTrue, hContainerTrue, wThickness, hThickness, maxPortionDedicatedToContainer, boxShader, buffersForBox, textShader, obstaclesVector);
 
@@ -190,20 +177,6 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    
-    /*if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        if(CURRENT_VAO == 0)
-        { 
-            CURRENT_VAO = 1;
-            std::cout << "Changed to 1" << std::endl;
-        }
-        else
-        { 
-            CURRENT_VAO = 0;
-            std::cout << "Changed to 0" << std::endl;
-        }
-    }*/
 
     if(shiftPressed)
     {
@@ -254,21 +227,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_S && action == GLFW_PRESS)
-    {
-        if(CURRENT_VAO == 0)
-        { 
-            CURRENT_VAO = 1;
-            std::cout << "Changed to 1" << std::endl;
-        }
-        else
-        { 
-            CURRENT_VAO = 0;
-            std::cout << "Changed to 0" << std::endl;
-        }
-    }
-
-
 
     if((key == GLFW_KEY_KP_ADD || key == GLFW_KEY_PERIOD) && action == GLFW_PRESS)
     {
