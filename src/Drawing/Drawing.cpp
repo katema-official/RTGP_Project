@@ -46,8 +46,10 @@ glm::vec2 getContainerEffectiveDimensions(int wContainer, int hContainer, float 
 }
 
 
-//-wContainer: the width of the container
-//-hContainer: the height of the container
+//-wC: the width of the container given by the input
+//-hC: the height of the container given by the input
+//-wContainer: the width of the container scaled according to the window dimensions
+//-hContainer: the height of the container scaled accordint to the window dimensions
 //-thickness: to express how thick the walls of the container should be wrt to SCR_WIDTH and SCR_HEIGHT respectively
 //-maxPortionDedicatedToContainer: to express the maximum percentage of the window that should be dedicated to the container
 //the remaining are data used to draw boxes or text
