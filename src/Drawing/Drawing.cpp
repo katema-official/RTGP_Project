@@ -883,7 +883,7 @@ void drawTextInTree(int lettersCount, Shader& textInTreeShader, unsigned int VAO
 
 
 
-void addModelMatrixAndTextureCoordinates_Nodes(std::vector<std::string> stringsVector, std::vector<glm::vec3> nodesPositions, int* textWidths, int nTextWidths,
+void  addModelMatrixAndTextureCoordinates_Nodes(std::vector<std::string> stringsVector, std::vector<glm::vec3> nodesPositions, int* textWidths, int nTextWidths,
     std::vector<glm::mat4>& modelMatrices, std::vector<glm::vec2>& textureOffsets, float xOffset, float yOffset, float scaleFactor, int& count)
 {
     for(int index = 0; index < stringsVector.size(); index++)   //for each string that we want to draw
@@ -918,7 +918,7 @@ void addModelMatrixAndTextureCoordinates_Nodes(std::vector<std::string> stringsV
             int k = (int) letter;
             float width = ((float) textWidths[k] / 48.0) * scaleFactor; //TODO: in case, modify
             currentPosition.x += width;
-            currentPosition.z += 0.001f; //so that the next gliph goes "on top" of the prevoius one
+            currentPosition.z += 0.001f; //so that the next gliph goes "on top" of the previous one
         }
     }
 
@@ -977,7 +977,7 @@ unsigned int getVAONodesText(std::vector<std::string> stringsVector, std::vector
 
 
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f, //  x0_texture, y0_texture,
+        -0.5f, -0.5f, 0.0f, //  x0_texture, y0_texture, these four comments represent the old data format. Now the texture coordinates are stored aside
         0.5f, -0.5f, 0.0f,  //  x1_texture, y0_texture,
         -0.5f, 0.5f, 0.0f,  //  x0_texture, y1_texture,
         0.5f, 0.5f, 0.0f,   //  x1_texture, y1_texture
