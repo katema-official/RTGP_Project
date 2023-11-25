@@ -14,7 +14,7 @@ class TreeNode
         int fatherID;
         int creationID;
         int PB;
-        int DB;
+        float DB;
         int bestPB;
         int level;
         Box** boxes;
@@ -27,7 +27,7 @@ class TreeNode
         std::vector<int> childNodesExplorationID;
         glm::vec3 positionInTree;
 
-        TreeNode(int _explorationID, int _fatherID, int _creationID, int _PB, int _DB, int bestPB, int _level, std::vector<int> remainingQuantities);
+        TreeNode(int _explorationID, int _fatherID, int _creationID, int _PB, float _DB, int bestPB, int _level, std::vector<int> remainingQuantities);
 
         ~TreeNode();
 

@@ -82,7 +82,7 @@ void readNodesInformations(int& wContainer, int& hContainer, std::vector<Box*>& 
         getline(infoFile, line);
         int PB = stoi(line);
         getline(infoFile, line);
-        int DB = stoi(line);
+        float DB = stof(line);
         getline(infoFile, line);
         int bestPB = stoi(line);
         getline(infoFile, line);

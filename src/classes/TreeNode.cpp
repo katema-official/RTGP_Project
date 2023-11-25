@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-TreeNode::TreeNode(int _explorationID, int _fatherID, int _creationID, int _PB, int _DB, int _bestPB, int _level, std::vector<int> _remainingQuantities)
+TreeNode::TreeNode(int _explorationID, int _fatherID, int _creationID, int _PB, float _DB, int _bestPB, int _level, std::vector<int> _remainingQuantities)
 {
     explorationID = _explorationID;
     fatherID = _fatherID;
